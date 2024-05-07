@@ -5,6 +5,7 @@ namespace Portfolio_Game_Core.Services;
 
 public class GameService
 {
+    private int _topMargin = 40;
     private List<GameObject> _objects;
     public Player _playerOne { get; set; }
     private int step;
@@ -39,21 +40,21 @@ public class GameService
             {
                case Direction.Right:
                    if (gameObject.Top <= player.Bottom 
-                       && gameObject.Bottom >= player.Top
+                       && gameObject.Bottom >= player.Top + _topMargin
                        && gameObject.Left >= player.Right 
                        && player.Right + speed > gameObject.Left)
                        return false;
                    break;
                case Direction.Left:
                    if (gameObject.Top <= player.Bottom 
-                       && gameObject.Bottom >= player.Top
+                       && gameObject.Bottom >= player.Top + _topMargin
                        && gameObject.Right <= player.Left 
                        && player.Left - speed < gameObject.Right)
                        return false;
                    break;
                case Direction.Up:
-                   if (gameObject.Bottom <= player.Top 
-                       && gameObject.Bottom >= player.Top - speed 
+                   if (gameObject.Bottom <= player.Top + _topMargin
+                       && gameObject.Bottom >= player.Top + _topMargin - speed 
                        && gameObject.Left <= player.Right 
                        && gameObject.Right >= player.Left)
                        return false;

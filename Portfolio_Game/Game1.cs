@@ -85,11 +85,11 @@ public class Game1 : Game
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
         _spriteBatch.Begin();
-        DrawObject(_gameService._playerOne);
         foreach (var gameObject in _gameService.Objects)
         {
             DrawObject(gameObject);
         }
+        DrawObject(_gameService._playerOne);
         _spriteBatch.End();
 
         base.Draw(gameTime);
