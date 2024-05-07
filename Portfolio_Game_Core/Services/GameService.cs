@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Portfolio_Game_Core.Entities.Graphical;
 using Portfolio_Game_Core.Interfaces;
 
 namespace Portfolio_Game_Core.Services;
@@ -7,18 +8,25 @@ public class GameService
 {
     private int _topMargin = 40;
     private List<GameObject> _objects;
+    private List<GameObject> _graphicObjects;
+    private List<GameObject> _floors;
+
     public Player _playerOne { get; set; }
-    private int step;
-    public IEnumerable<GameObject> Objects
-    {
-        get => _objects.AsReadOnly();
-    }
-    
-    public GameService()
+    public Vector2 ScreenSize { get; }
+    public IEnumerable<GameObject> Objects => _objects.AsReadOnly();
+    public IEnumerable<GameObject> GraphicObjects => _graphicObjects.AsReadOnly();
+    public IEnumerable<GameObject> Floors => _floors.AsReadOnly();
+    public GameService(int screenWidth, int screenHeight)
     {
         _playerOne = new Player(0, 0);
         _objects = new List<GameObject>();
+        _graphicObjects = new List<GameObject>();
+        _floors = new List<GameObject>();
+        ScreenSize = new Vector2(screenWidth,screenHeight);
+        GetFloor();
+        AddGraphicObjects();
     }
+
     public void AddObject(GameObject gameObject)
     {
         if (_objects.Contains(gameObject)) return;
@@ -27,9 +35,18 @@ public class GameService
     public void RemoveObject(GameObject gameObject)
     { 
         if (_objects.Contains(gameObject)) return; 
-        _objects.Add(gameObject);
+        _objects.Remove(gameObject);
     }
-
+    public void AddGraphicObject(GameObject gameObject)
+    {
+        if (_graphicObjects.Contains(gameObject)) return;
+        _graphicObjects.Add(gameObject);
+    }
+    public void RemoveGraphicObject(GameObject gameObject)
+    { 
+        if (_graphicObjects.Contains(gameObject)) return; 
+        _graphicObjects.Remove(gameObject);
+    }
     public bool CanMove(IMovable movable, Direction direction, float deltaTime)
     {
         if (movable is not Player player) return false;
@@ -70,5 +87,23 @@ public class GameService
         }
 
         return true;
+    }
+
+    private void GetFloor()
+    {
+        int width = Floor.floorWidth; 
+        int height = Floor.floorHeight; 
+        for (int i = 0; i < ScreenSize.Y; i++)
+        {
+            for (int j = 0; j < ScreenSize.X; j++)
+            {
+                _floors.Add(new Floor(j*width,i*height));
+            }
+        }
+    }
+
+    public void AddGraphicObjects()
+    {
+        _graphicObjects.Add(new Carpet((int)(ScreenSize.X/2 - Carpet.carpetWidth/2),(int)(ScreenSize.Y/2 - Carpet.carpetHeight/2)));
     }
 }

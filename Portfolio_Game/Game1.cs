@@ -17,15 +17,14 @@ public class Game1 : Game
 
     public Game1()
     {
-        _gameService = new GameService();
         _graphics = new GraphicsDeviceManager(this);
+        _gameService = new GameService(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
     }
 
     protected override void Initialize()
     {
-        // TODO: Add your initialization logic here
         Player player = _gameService._playerOne; 
         player.PositionX = _graphics.PreferredBackBufferWidth / 2 - (player.Width/2);
         player.PositionY = _graphics.PreferredBackBufferHeight / 2 - (player.Height/2);
@@ -36,10 +35,17 @@ public class Game1 : Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
-
-        // TODO: use this.Content to load your game content here
         _gameService._playerOne.Texture = Content.Load<Texture2D>("character");
         _gameService.Objects.First().Texture = Content.Load<Texture2D>("objects");
+        foreach (var floor in _gameService.Floors)
+        {
+            floor.Texture = Content.Load<Texture2D>("inner");
+        }
+
+        foreach (var graphicObject in _gameService.GraphicObjects)
+        {
+            graphicObject.Texture = Content.Load<Texture2D>("inner");
+        }
     }
 
     protected override void Update(GameTime gameTime)
@@ -85,6 +91,15 @@ public class Game1 : Game
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
         _spriteBatch.Begin();
+        foreach (var floor in _gameService.Floors)
+        {
+            DrawObject(floor); 
+        }
+
+        foreach (var graphicObject in _gameService.GraphicObjects)
+        {
+           DrawObject(graphicObject); 
+        }
         foreach (var gameObject in _gameService.Objects)
         {
             DrawObject(gameObject);
