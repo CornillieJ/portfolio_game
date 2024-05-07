@@ -29,9 +29,10 @@ public class GameService
         _objects.Add(gameObject);
     }
 
-    public bool CanMove(IMovable movable, Direction direction)
+    public bool CanMove(IMovable movable, Direction direction, float deltaTime)
     {
         if (movable is not Player player) return false;
+        float speed = player.Speed * deltaTime;
         foreach (var gameObject in _objects)
         {
             switch (direction)
@@ -40,26 +41,26 @@ public class GameService
                    if (gameObject.Top <= player.Bottom 
                        && gameObject.Bottom >= player.Top
                        && gameObject.Left >= player.Right 
-                       && player.Right + player.Speed > gameObject.Left)
+                       && player.Right + speed > gameObject.Left)
                        return false;
                    break;
                case Direction.Left:
                    if (gameObject.Top <= player.Bottom 
                        && gameObject.Bottom >= player.Top
                        && gameObject.Right <= player.Left 
-                       && player.Left - player.Speed < gameObject.Right)
+                       && player.Left - speed < gameObject.Right)
                        return false;
                    break;
                case Direction.Up:
                    if (gameObject.Bottom <= player.Top 
-                       && gameObject.Bottom >= player.Top - player.Speed 
+                       && gameObject.Bottom >= player.Top - speed 
                        && gameObject.Left <= player.Right 
                        && gameObject.Right >= player.Left)
                        return false;
                    break;
                   case Direction.Down:
                       if (gameObject.Top >= player.Bottom 
-                          && gameObject.Top <= player.Bottom + player.Speed 
+                          && gameObject.Top <= player.Bottom + speed 
                           && gameObject.Left <= player.Right 
                           && gameObject.Right >= player.Left)
                           return false;

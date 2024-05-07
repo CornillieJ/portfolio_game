@@ -2,8 +2,8 @@
 
 public interface IMovable
 {
-    public void GoRight(float deltaTime);
-    public void GoLeft(float deltaTime);
-    public void GoUp(float deltaTime);
-    public void GoDown(float deltaTime);
+    public void GoRight(float deltaTime, bool canMove);
+    public void GoLeft(float deltaTime, bool canMove);
+    public void GoUp(float deltaTime, bool canMove);
+    public void GoDown(float deltaTime, bool canMove);
 }
