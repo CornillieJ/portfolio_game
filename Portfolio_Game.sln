@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portfolio_Game", "Portfolio_Game\Portfolio_Game.csproj", "{BF0B0215-F388-469F-AE51-F37FDFACFAFE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portfolio_Game_Core", "Portfolio_Game_Core\Portfolio_Game_Core.csproj", "{21844EC9-35B8-49DB-810B-49C3B2139F34}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BF0B0215-F388-469F-AE51-F37FDFACFAFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF0B0215-F388-469F-AE51-F37FDFACFAFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF0B0215-F388-469F-AE51-F37FDFACFAFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF0B0215-F388-469F-AE51-F37FDFACFAFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21844EC9-35B8-49DB-810B-49C3B2139F34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21844EC9-35B8-49DB-810B-49C3B2139F34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21844EC9-35B8-49DB-810B-49C3B2139F34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21844EC9-35B8-49DB-810B-49C3B2139F34}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
