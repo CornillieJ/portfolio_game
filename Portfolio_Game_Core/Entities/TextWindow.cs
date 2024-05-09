@@ -8,12 +8,12 @@ namespace Portfolio_Game_Core.Entities;
 
 public class TextWindow:Window, IVisible
 {
-    public static int TextWindowHeight => 224;
+    public static int TextWindowHeight => 200;
     public static int TextWindowWidth => 720;
     public static Texture2D Texture { get; set; }
     private int _marginX = 48;
-    private int _marginY = 24;
-    private List<Text> _content;
+    private int _marginY = 48;
+    public List<Text> _content;
     public IEnumerable<Text> Content => _content.AsReadOnly();
 
     public TextWindow(int x, int y, string title, string content) : base(x, y, title)
@@ -29,20 +29,26 @@ public class TextWindow:Window, IVisible
     private List<Text> GetText(string content)
     {
         List<Text> result = new();
-        int positionX = _marginX;
-        int positionY = _marginY;
-        foreach (char c in content)
+        int textX = PositionX + _marginX;
+        int textY = PositionY + _marginY;
+        string[] words = content.Split(' ');
+        foreach (string word in words)
         {
-            if (int.TryParse(c.ToString(), out int value))
-                result.Add(new Number(positionX, positionY, c));
-            else
-                result.Add(new Letter(positionX,positionY,c));
-            positionX += Text.TextWidth;
-            if (positionX >= TextWindowWidth - _marginX)
+            if (textX + word.Length * Text.TextWidth >= PositionX + TextWindowWidth - _marginX)
             {
-                positionX = _marginX;
-                positionY += Text.TextHeight;
+                textX = PositionX + _marginX;
+                textY += Text.TextHeight;
             }
+            foreach (char c in word)
+            {
+                if (int.TryParse(c.ToString(), out int value))
+                    result.Add(new Number(textX, textY, c));
+                else
+                    result.Add(new Letter(textX, textY, c));
+                textX += Text.TextWidth;
+            }
+            result.Add(new Letter(textX, textY, ' ')); 
+            textX += Text.TextWidth;
         }
         return result;
     }

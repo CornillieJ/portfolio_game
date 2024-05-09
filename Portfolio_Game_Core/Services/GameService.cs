@@ -117,6 +117,21 @@ public class GameService
 
     private void SeedStartText()
     {
-        _windows.Add(_windowCreator.GetTextWindow("Hello", TextData.WelcomeText));
+        _windows.AddRange(_windowCreator.GetTextWindows(new List<string>{ "Welcome"} , TextData.WelcomeTexts));
+    }
+
+    public void ShiftWindow()
+    {
+        _windows.RemoveAt(0);
+    }
+    public void RemoveWindow(Window window)
+    {
+        if (!_windows.Contains(window)) return;
+        _windows.Remove(window);
+    }
+
+    public void AddWindow(Window window)
+    {
+        _windows.Add(window);
     }
 }

@@ -18,4 +18,18 @@ public class WindowCreator
         int height = TextWindow.TextWindowHeight;
         return new TextWindow(_screenWidth/2 - width / 2, _screenHeight - height - 20,title,content);
     } 
+    public IEnumerable<TextWindow> GetTextWindows(IEnumerable<string> titles, IEnumerable<string> contents)
+    {
+        
+        int width = TextWindow.TextWindowWidth;
+        int height = TextWindow.TextWindowHeight;
+        string previousTitle = "";
+        for(int i = 0; i < contents.Count(); i++)
+        {
+            string title = titles.Count() > i ? titles.ElementAt(i): previousTitle;
+            previousTitle = title;
+            string content = contents.ElementAt(i) ?? "";
+            yield return new TextWindow(_screenWidth/2 - width / 2, _screenHeight - height - 20,title,content);
+        }
+    } 
 }

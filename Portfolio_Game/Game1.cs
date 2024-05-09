@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -16,6 +17,7 @@ public class Game1 : Game
     private GameService _gameService;
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
+    private bool _isActionPressed = false;
 
     public Game1()
     {
@@ -39,7 +41,7 @@ public class Game1 : Game
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         Player.Texture = Content.Load<Texture2D>("character");
         Floor.Texture = Content.Load<Texture2D>("inner");
-        TextWindow.Texture = Content.Load<Texture2D>("window");
+        TextWindow.Texture = Content.Load<Texture2D>("window200");
         Text.Texture = Content.Load<Texture2D>("font");
         foreach (var gameServiceObject in _gameService.Objects)
         {
@@ -55,12 +57,27 @@ public class Game1 : Game
 
     protected override void Update(GameTime gameTime)
     {
+        Player player = _gameService._playerOne;
         var kstate = Keyboard.GetState();
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
             kstate.IsKeyDown(Keys.Escape))
             Exit();
-
-        Player player = _gameService._playerOne;
+        if (!kstate.IsKeyDown(Keys.Space) && !kstate.IsKeyDown(Keys.Enter))
+        {
+            _isActionPressed = false;
+        }
+        //Only check input up to here if there are open text windows (no walking)
+        if (_gameService.Windows.OfType<TextWindow>().Any())
+        {
+            if (_isActionPressed) return;
+            if (kstate.IsKeyDown(Keys.Space) || kstate.IsKeyDown(Keys.Enter))
+            {
+                _isActionPressed = true;
+                _gameService.ShiftWindow();
+            }
+            base.Update(gameTime);
+            return;
+        }
         PlayerState newPlayerState = PlayerState.Neutral;
         if (kstate.IsKeyDown(Keys.W))
         {
@@ -108,15 +125,25 @@ public class Game1 : Game
         {
             DrawObject(gameObject);
         }
-
-        foreach (var window in _gameService.Windows)
-        {
-            DrawObject(window);
-        }
         DrawObject(_gameService._playerOne);
+        var windows = _gameService.Windows.ToArray(); 
+        for(int i = windows.Length-1; i >= 0; i--)
+        {
+            DrawObject(windows[i]);
+            if(windows[i] is TextWindow textWindow)
+                DrawObjects(textWindow.Content);
+        }
         _spriteBatch.End();
 
         base.Draw(gameTime);
+    }
+
+    private void DrawObjects(IEnumerable<GameObject> gameObjects)
+    {
+        foreach (var gameObject in gameObjects)
+        {
+           DrawObject(gameObject); 
+        }
     }
     private void DrawObject(GameObject gameObject)
     {
