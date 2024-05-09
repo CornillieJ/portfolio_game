@@ -3,66 +3,51 @@ using Portfolio_Game_Core.Data;
 using Portfolio_Game_Core.Entities;
 using Portfolio_Game_Core.Entities.Graphical;
 using Portfolio_Game_Core.Interfaces;
+using Portfolio_Game_Core.Maps;
 
 namespace Portfolio_Game_Core.Services;
 
 public class GameService
 {
     private int _topMargin = 40;
-    private List<GameObject> _objects;
-    private List<GameObject> _graphicObjects;
-    private List<GameObject> _floors;
-    private List<Window> _windows;
-    private List<IInteractable> _interactables;
-
     private WindowCreator _windowCreator;
     public Player _playerOne { get; set; }
     public Vector2 ScreenSize { get; }
-    public IEnumerable<GameObject> Objects => _objects.AsReadOnly();
-    public IEnumerable<GameObject> GraphicObjects => _graphicObjects.AsReadOnly();
-    public IEnumerable<GameObject> Floors => _floors.AsReadOnly();
-    public IEnumerable<Window> Windows => _windows.AsReadOnly();
-    public IEnumerable<IInteractable> Interactables => _interactables.AsReadOnly();
+    public Map CurrentMap { get; set; }
+
     public GameService(int screenWidth, int screenHeight)
     {
+        ScreenSize = new Vector2(screenWidth, screenHeight);
         _windowCreator = new WindowCreator(screenWidth,screenHeight);
         _playerOne = new Player(0, 0);
-        _objects = new List<GameObject>();
-        _graphicObjects = new List<GameObject>();
-        _floors = new List<GameObject>();
-        _windows = new List<Window>();
-        _interactables = new List<IInteractable>();
-        ScreenSize = new Vector2(screenWidth,screenHeight);
-        GetFloor();
-        SeedGraphicObjects();
-        SeedStartText();
+        CurrentMap = new FirstMap(screenWidth,screenHeight);
     }
 
     public void AddObject(GameObject gameObject)
     {
-        if (_objects.Contains(gameObject)) return;
-       _objects.Add(gameObject);
+        if (CurrentMap.Objects.Contains(gameObject)) return;
+        CurrentMap.Objects.Add(gameObject);
     }
     public void RemoveObject(GameObject gameObject)
     { 
-        if (_objects.Contains(gameObject)) return; 
-        _objects.Remove(gameObject);
+        if (CurrentMap.Objects.Contains(gameObject)) return; 
+        CurrentMap.Objects.Remove(gameObject);
     }
     public void AddGraphicObject(GameObject gameObject)
     {
-        if (_graphicObjects.Contains(gameObject)) return;
-        _graphicObjects.Add(gameObject);
+        if (CurrentMap.GraphicObjects.Contains(gameObject)) return;
+        CurrentMap.GraphicObjects.Add(gameObject);
     }
     public void RemoveGraphicObject(GameObject gameObject)
     { 
-        if (_graphicObjects.Contains(gameObject)) return; 
-        _graphicObjects.Remove(gameObject);
+        if (CurrentMap.GraphicObjects.Contains(gameObject)) return; 
+        CurrentMap.GraphicObjects.Remove(gameObject);
     }
     public bool CanMove(IMovable movable, Direction direction, float deltaTime)
     {
         if (movable is not Player player) return false;
         float speed = player.Speed * deltaTime;
-        foreach (var gameObject in _objects)
+        foreach (var gameObject in CurrentMap.Objects)
         {
             switch (direction)
             {
@@ -100,46 +85,25 @@ public class GameService
         return true;
     }
 
-    private void GetFloor()
-    {
-        int width = Floor.FloorWidth; 
-        int height = Floor.FloorHeight; 
-        for (int i = 0; i < ScreenSize.Y; i++)
-        {
-            for (int j = 0; j < ScreenSize.X; j++)
-            {
-                _floors.Add(new Floor(j*width,i*height));
-            }
-        }
-    }
-
-    private void SeedGraphicObjects()
-    {
-        _graphicObjects.Add(new Carpet((int)(ScreenSize.X/2 - Carpet.carpetWidth/2),(int)(ScreenSize.Y/2 - Carpet.carpetHeight/2)));
-    }
-
-    private void SeedStartText()
-    {
-        _windows.AddRange(_windowCreator.GetTextWindows(new List<string>{ "Welcome"} , TextData.WelcomeTexts));
-    }
+    
     public void ShiftWindow()
     {
-        _windows.RemoveAt(0);
+        CurrentMap.Windows.RemoveAt(0);
     }
     public void RemoveWindow(Window window)
     {
-        if (!_windows.Contains(window)) return;
-        _windows.Remove(window);
+        if (!CurrentMap.Windows.Contains(window)) return;
+        CurrentMap.Windows.Remove(window);
     }
 
     public void AddWindow(Window window)
     {
-        _windows.Add(window);
+        CurrentMap.Windows.Add(window);
     }
 
     public GameObject? GetObjectAtLocation(Vector2 location)
     {
-        foreach (var gameObject in Objects)
+        foreach (var gameObject in CurrentMap.Objects)
         {
             if (location.X >= gameObject.Left && location.X <= gameObject.Right && location.Y >= gameObject.Top && location.Y <= gameObject.Bottom)
                 return gameObject;
@@ -156,20 +120,20 @@ public class GameService
 
     public void AddInteraction(IInteractable interactable)
     {
-        _interactables.Add(interactable);
+        CurrentMap.Interactables.Add(interactable);
     }
     public void RemoveInteraction(IInteractable interactable)
     {
-        if(_interactables.Contains(interactable))
-            _interactables.Remove(interactable);
+        if(CurrentMap.Interactables.Contains(interactable))
+            CurrentMap.Interactables.Remove(interactable);
     }
     public void InteractAll()
     {
-        while(_interactables.Any())
+        while(CurrentMap.Interactables.Any())
         {
-            var interactText = _interactables[0].Interact();
-            _windows.Add( _windowCreator.GetTextWindow(interactText.Item1,interactText.Item2));
-            _interactables.RemoveAt(0);
+            var interactText = CurrentMap.Interactables[0].Interact();
+            CurrentMap.Windows.Add( _windowCreator.GetTextWindow(interactText.Item1,interactText.Item2));
+            CurrentMap.Interactables.RemoveAt(0);
         }
     }
 }

@@ -7,5 +7,5 @@ public enum PlayerState
 
 public enum Direction
 {
-   Up,Down,Left,Right
+   Up,Down,Left,Right,UpLeft,UpRight,DownLeft,DownRight,Neutral
 }

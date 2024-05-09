@@ -39,20 +39,21 @@ public class Game1 : Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
+        foreach (var gameServiceObject in _gameService.CurrentMap.Objects)
+        {
+            if (gameServiceObject is not IVisible iVisible) continue;
+            iVisible.SetStaticTexture(Content.Load<Texture2D>("objects"));
+        }
+        foreach (var graphicObject in _gameService.CurrentMap.GraphicObjects)
+        {
+            if (graphicObject is not IVisible iVisible) continue;
+            iVisible.SetStaticTexture(Content.Load<Texture2D>("inner"));
+        }
         Player.Texture = Content.Load<Texture2D>("character");
         Floor.Texture = Content.Load<Texture2D>("inner");
+        Wall.Texture = Content.Load<Texture2D>("inner");
         TextWindow.Texture = Content.Load<Texture2D>("window200");
         Text.Texture = Content.Load<Texture2D>("font2");
-        foreach (var gameServiceObject in _gameService.Objects)
-        {
-            if(gameServiceObject is IVisible iVisible)
-                iVisible.SetStaticTexture(Content.Load<Texture2D>("objects"));
-        }
-        foreach (var graphicObject in _gameService.GraphicObjects)
-        {
-            if(graphicObject is IVisible iVisible)
-                iVisible.SetStaticTexture(Content.Load<Texture2D>("inner"));
-        }
     }
 
     protected override void Update(GameTime gameTime)
@@ -65,7 +66,7 @@ public class Game1 : Game
         {
             _isActionPressed = false;
         }
-        if (_gameService.Windows.OfType<TextWindow>().Any())
+        if (_gameService.CurrentMap.Windows.OfType<TextWindow>().Any())
         {
             if (_isActionPressed) return;
             if (kstate.IsKeyDown(Keys.Space) || kstate.IsKeyDown(Keys.Enter))
@@ -105,7 +106,7 @@ public class Game1 : Game
 
     private void DrawGameObjects()
     {
-        foreach (var gameObject in _gameService.Objects)
+        foreach (var gameObject in _gameService.CurrentMap.Objects)
         {
             DrawObject(gameObject);
         }
@@ -113,7 +114,7 @@ public class Game1 : Game
 
     private void DrawGraphicObjects()
     {
-        foreach (var graphicObject in _gameService.GraphicObjects)
+        foreach (var graphicObject in _gameService.CurrentMap.GraphicObjects)
         {
             DrawObject(graphicObject); 
         }
@@ -121,7 +122,7 @@ public class Game1 : Game
 
     private void DrawFloors()
     {
-        foreach (var floor in _gameService.Floors)
+        foreach (var floor in _gameService.CurrentMap.Floors)
         {
             DrawObject(floor); 
         }
@@ -129,7 +130,7 @@ public class Game1 : Game
 
     private void DrawWindows()
     {
-        var windows = _gameService.Windows.ToArray();
+        var windows = _gameService.CurrentMap.Windows.ToArray();
         for(int i = windows.Length-1; i >= 0; i--)
         {
             DrawObject(windows[i]);
