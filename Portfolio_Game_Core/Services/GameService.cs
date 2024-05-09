@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
+using Portfolio_Game_Core.Data;
+using Portfolio_Game_Core.Entities;
 using Portfolio_Game_Core.Entities.Graphical;
 using Portfolio_Game_Core.Interfaces;
 
@@ -10,21 +12,27 @@ public class GameService
     private List<GameObject> _objects;
     private List<GameObject> _graphicObjects;
     private List<GameObject> _floors;
+    private List<Window> _windows;
 
+    private WindowCreator _windowCreator;
     public Player _playerOne { get; set; }
     public Vector2 ScreenSize { get; }
     public IEnumerable<GameObject> Objects => _objects.AsReadOnly();
     public IEnumerable<GameObject> GraphicObjects => _graphicObjects.AsReadOnly();
     public IEnumerable<GameObject> Floors => _floors.AsReadOnly();
+    public IEnumerable<Window> Windows => _windows.AsReadOnly();
     public GameService(int screenWidth, int screenHeight)
     {
+        _windowCreator = new WindowCreator(screenWidth,screenHeight);
         _playerOne = new Player(0, 0);
         _objects = new List<GameObject>();
         _graphicObjects = new List<GameObject>();
         _floors = new List<GameObject>();
+        _windows = new List<Window>();
         ScreenSize = new Vector2(screenWidth,screenHeight);
         GetFloor();
-        AddGraphicObjects();
+        SeedGraphicObjects();
+        SeedStartText();
     }
 
     public void AddObject(GameObject gameObject)
@@ -102,8 +110,13 @@ public class GameService
         }
     }
 
-    public void AddGraphicObjects()
+    private void SeedGraphicObjects()
     {
         _graphicObjects.Add(new Carpet((int)(ScreenSize.X/2 - Carpet.carpetWidth/2),(int)(ScreenSize.Y/2 - Carpet.carpetHeight/2)));
+    }
+
+    private void SeedStartText()
+    {
+        _windows.Add(_windowCreator.GetTextWindow("Hello", TextData.WelcomeText));
     }
 }

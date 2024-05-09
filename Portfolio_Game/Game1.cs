@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using Portfolio_Game_Core;
 using Portfolio_Game_Core.Entities;
 using Portfolio_Game_Core.Entities.Graphical;
+using Portfolio_Game_Core.Font;
 using Portfolio_Game_Core.Interfaces;
 using Portfolio_Game_Core.Services;
 
@@ -38,6 +39,8 @@ public class Game1 : Game
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         Player.Texture = Content.Load<Texture2D>("character");
         Floor.Texture = Content.Load<Texture2D>("inner");
+        TextWindow.Texture = Content.Load<Texture2D>("window");
+        Text.Texture = Content.Load<Texture2D>("font");
         foreach (var gameServiceObject in _gameService.Objects)
         {
             if(gameServiceObject is IVisible iVisible)
@@ -97,7 +100,6 @@ public class Game1 : Game
         {
             DrawObject(floor); 
         }
-
         foreach (var graphicObject in _gameService.GraphicObjects)
         {
            DrawObject(graphicObject); 
@@ -105,6 +107,11 @@ public class Game1 : Game
         foreach (var gameObject in _gameService.Objects)
         {
             DrawObject(gameObject);
+        }
+
+        foreach (var window in _gameService.Windows)
+        {
+            DrawObject(window);
         }
         DrawObject(_gameService._playerOne);
         _spriteBatch.End();

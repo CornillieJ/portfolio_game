@@ -6,7 +6,7 @@ namespace Portfolio_Game_Core.Entities;
 
 public class Chest:GameObject, IInteractable, IVisible
 {
-    public static Texture2D Texture { get; set; }
+    private static Texture2D Texture { get; set; }
     private static int ChestWidth => 30;
     private static int ChestHeight => 25;
     private List<GameObject> _inventory;
