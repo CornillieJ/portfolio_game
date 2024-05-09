@@ -12,9 +12,12 @@ public class TextWindow:Window, IVisible
     public static int TextWindowWidth => 720;
     public static Texture2D Texture { get; set; }
     private int _marginX = 48;
+    private int _marginTitle = 10;
     private int _marginY = 48;
     public List<Text> _content;
+    public List<Text> _title;
     public IEnumerable<Text> Content => _content.AsReadOnly();
+    public IEnumerable<Text> Title => _title.AsReadOnly();
 
     public TextWindow(int x, int y, string title, string content) : base(x, y, title)
     {
@@ -24,6 +27,7 @@ public class TextWindow:Window, IVisible
         PositionY = y;
         CurrentSprite = new Rectangle(0, 0, Width, Height);
         _content = GetText(content);
+        _title = GetTitle(title);
     }
 
     private List<Text> GetText(string content)
@@ -50,6 +54,22 @@ public class TextWindow:Window, IVisible
             result.Add(new Letter(textX, textY, ' ')); 
             textX += Text.TextWidth;
         }
+        return result;
+    }
+
+    public List<Text> GetTitle(string title)
+    {
+        List<Text> result = new();
+        int textX = PositionX + _marginTitle; 
+        foreach (char c in title)
+        {
+            if (int.TryParse(c.ToString(), out int value))
+                result.Add(new Number(textX, PositionY, c));
+            else
+                result.Add(new Letter(textX, PositionY, c));
+            textX += Text.TextWidth;
+        }
+
         return result;
     }
     public Texture2D GetStaticTexture()

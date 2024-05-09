@@ -126,16 +126,24 @@ public class Game1 : Game
             DrawObject(gameObject);
         }
         DrawObject(_gameService._playerOne);
-        var windows = _gameService.Windows.ToArray(); 
-        for(int i = windows.Length-1; i >= 0; i--)
-        {
-            DrawObject(windows[i]);
-            if(windows[i] is TextWindow textWindow)
-                DrawObjects(textWindow.Content);
-        }
+        DrawWindows();
         _spriteBatch.End();
 
         base.Draw(gameTime);
+    }
+
+    private void DrawWindows()
+    {
+        var windows = _gameService.Windows.ToArray();
+        for(int i = windows.Length-1; i >= 0; i--)
+        {
+            DrawObject(windows[i]);
+            if (windows[i] is TextWindow textWindow)
+            {
+                DrawObjects(textWindow._title);
+                DrawObjects(textWindow.Content);
+            }
+        }
     }
 
     private void DrawObjects(IEnumerable<GameObject> gameObjects)
