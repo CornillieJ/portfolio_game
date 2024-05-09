@@ -91,8 +91,8 @@ public class GameService
 
     private void GetFloor()
     {
-        int width = Floor.floorWidth; 
-        int height = Floor.floorHeight; 
+        int width = Floor.FloorWidth; 
+        int height = Floor.FloorHeight; 
         for (int i = 0; i < ScreenSize.Y; i++)
         {
             for (int j = 0; j < ScreenSize.X; j++)
