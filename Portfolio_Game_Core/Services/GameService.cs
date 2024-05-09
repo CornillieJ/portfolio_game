@@ -119,7 +119,6 @@ public class GameService
     {
         _windows.AddRange(_windowCreator.GetTextWindows(new List<string>{ "Welcome"} , TextData.WelcomeTexts));
     }
-
     public void ShiftWindow()
     {
         _windows.RemoveAt(0);

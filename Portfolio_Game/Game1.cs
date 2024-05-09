@@ -42,7 +42,7 @@ public class Game1 : Game
         Player.Texture = Content.Load<Texture2D>("character");
         Floor.Texture = Content.Load<Texture2D>("inner");
         TextWindow.Texture = Content.Load<Texture2D>("window200");
-        Text.Texture = Content.Load<Texture2D>("font");
+        Text.Texture = Content.Load<Texture2D>("font2");
         foreach (var gameServiceObject in _gameService.Objects)
         {
             if(gameServiceObject is IVisible iVisible)
@@ -66,7 +66,6 @@ public class Game1 : Game
         {
             _isActionPressed = false;
         }
-        //Only check input up to here if there are open text windows (no walking)
         if (_gameService.Windows.OfType<TextWindow>().Any())
         {
             if (_isActionPressed) return;
@@ -78,6 +77,7 @@ public class Game1 : Game
             base.Update(gameTime);
             return;
         }
+        //Only check input up to here if there are open text windows (no walking allowed if open)
         PlayerState newPlayerState = PlayerState.Neutral;
         if (kstate.IsKeyDown(Keys.W))
         {
@@ -113,23 +113,38 @@ public class Game1 : Game
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
         _spriteBatch.Begin();
-        foreach (var floor in _gameService.Floors)
-        {
-            DrawObject(floor); 
-        }
-        foreach (var graphicObject in _gameService.GraphicObjects)
-        {
-           DrawObject(graphicObject); 
-        }
-        foreach (var gameObject in _gameService.Objects)
-        {
-            DrawObject(gameObject);
-        }
+        DrawFloors();
+        DrawGraphicObjects();
+        DrawGameObjects();
         DrawObject(_gameService._playerOne);
         DrawWindows();
         _spriteBatch.End();
 
         base.Draw(gameTime);
+    }
+
+    private void DrawGameObjects()
+    {
+        foreach (var gameObject in _gameService.Objects)
+        {
+            DrawObject(gameObject);
+        }
+    }
+
+    private void DrawGraphicObjects()
+    {
+        foreach (var graphicObject in _gameService.GraphicObjects)
+        {
+            DrawObject(graphicObject); 
+        }
+    }
+
+    private void DrawFloors()
+    {
+        foreach (var floor in _gameService.Floors)
+        {
+            DrawObject(floor); 
+        }
     }
 
     private void DrawWindows()

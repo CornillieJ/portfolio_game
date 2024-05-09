@@ -1,4 +1,5 @@
 ﻿using System.Net.Mime;
+using System.Threading.Tasks.Dataflow;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Portfolio_Game_Core.Font;
@@ -19,7 +20,7 @@ public class TextWindow:Window, IVisible
     public IEnumerable<Text> Content => _content.AsReadOnly();
     public IEnumerable<Text> Title => _title.AsReadOnly();
 
-    public TextWindow(int x, int y, string title, string content) : base(x, y, title)
+    public TextWindow(int x, int y, string title, string content, bool isTest = false) : base(x, y, title)
     {
         Width = TextWindowWidth;
         Height = TextWindowHeight;
@@ -28,8 +29,13 @@ public class TextWindow:Window, IVisible
         CurrentSprite = new Rectangle(0, 0, Width, Height);
         _content = GetText(content);
         _title = GetTitle(title);
+        if (isTest) _content = GetTestText();
     }
 
+    private List<Text> GetTestText()
+    {
+        return GetText( String.Join("", Letter._chars));
+    }
     private List<Text> GetText(string content)
     {
         List<Text> result = new();
@@ -45,11 +51,12 @@ public class TextWindow:Window, IVisible
             }
             foreach (char c in word)
             {
+                if (c == 'i') textX -= Text.TextWidth - Text.TextWidthSmall;
                 if (int.TryParse(c.ToString(), out int value))
                     result.Add(new Number(textX, textY, c));
                 else
                     result.Add(new Letter(textX, textY, c));
-                textX += Text.TextWidth;
+                textX += c=='i' ? Text.TextWidthSmall : Text.TextWidth;
             }
             result.Add(new Letter(textX, textY, ' ')); 
             textX += Text.TextWidth;
@@ -72,6 +79,7 @@ public class TextWindow:Window, IVisible
 
         return result;
     }
+    
     public Texture2D GetStaticTexture()
     {
         return Texture;
