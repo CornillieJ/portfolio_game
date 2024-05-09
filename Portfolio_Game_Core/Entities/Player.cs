@@ -4,8 +4,9 @@ using Portfolio_Game_Core.Interfaces;
 
 namespace Portfolio_Game_Core;
 
-public class Player: GameObject, IMovable
+public class Player: GameObject, IMovable, IVisible
 {
+    public static Texture2D Texture { get; set; }
     public float Speed { get; set; } = 150;
     private int _spriteChangeSpeed = 10;
     private int _spriteNumber;
@@ -30,7 +31,14 @@ public class Player: GameObject, IMovable
     {
         Texture = texture;
     }
-
+    public Texture2D GetStaticTexture()
+    {
+        return Texture;
+    }
+    public void SetStaticTexture(Texture2D texture)
+    {
+        Texture = texture;
+    }
     public void GoRight(float deltaTime, bool canMove)
     {
         if(canMove)

@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Portfolio_Game_Core;
 using Portfolio_Game_Core.Entities;
+using Portfolio_Game_Core.Entities.Graphical;
 using Portfolio_Game_Core.Interfaces;
 using Portfolio_Game_Core.Services;
 
@@ -35,16 +36,17 @@ public class Game1 : Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
-        _gameService._playerOne.Texture = Content.Load<Texture2D>("character");
-        _gameService.Objects.First().Texture = Content.Load<Texture2D>("objects");
-        foreach (var floor in _gameService.Floors)
+        Player.Texture = Content.Load<Texture2D>("character");
+        Floor.Texture = Content.Load<Texture2D>("inner");
+        foreach (var gameServiceObject in _gameService.Objects)
         {
-            floor.Texture = Content.Load<Texture2D>("inner");
+            if(gameServiceObject is IVisible iVisible)
+                iVisible.SetStaticTexture(Content.Load<Texture2D>("objects"));
         }
-
         foreach (var graphicObject in _gameService.GraphicObjects)
         {
-            graphicObject.Texture = Content.Load<Texture2D>("inner");
+            if(graphicObject is IVisible iVisible)
+                iVisible.SetStaticTexture(Content.Load<Texture2D>("inner"));
         }
     }
 
@@ -111,7 +113,8 @@ public class Game1 : Game
     }
     private void DrawObject(GameObject gameObject)
     {
-        Texture2D texture= gameObject.Texture;
+        if (gameObject is not IVisible iVisible) return;
+        Texture2D texture= iVisible.GetStaticTexture();
         Vector2 vector2 = new(gameObject.PositionX, gameObject.PositionY);
         var sourceRectangle = gameObject.CurrentSprite;
         var color = Color.White;
