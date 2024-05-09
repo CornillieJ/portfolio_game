@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Portfolio_Game_Core.Interfaces;
+using Portfolio_Game_Core.Services;
 
 namespace Portfolio_Game_Core.Entities;
 
@@ -31,9 +32,9 @@ public class Chest:GameObject, IInteractable, IVisible
     {
         Texture = texture;
     }
-    public void Interact()
+    public (string,string) Interact()
     {
-        
+        return ("chest", "This is a chest with a sword inside");
     }
 
     public void ShowInventory()

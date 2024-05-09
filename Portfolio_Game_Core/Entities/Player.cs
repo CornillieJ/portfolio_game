@@ -90,4 +90,21 @@ public class Player: GameObject, IMovable, IVisible
         CurrentSprite = SpriteData.DownSprites[_spriteNumber/_spriteChangeSpeed];
         Direction = Direction.Down;
     }
+
+    public Vector2 GetVisionCoordinate(int distance = 5)
+    {
+        switch (Direction)
+        {
+           case Direction.Down:
+               return new Vector2(PositionX + Width/2, Middle.Y + distance);
+           case Direction.Up:
+               return new Vector2(PositionX + Width/2, Middle.Y - distance);
+           case Direction.Right:
+               return new Vector2(Right + distance, PositionY + Height/2);
+           case Direction.Left:
+               return new Vector2(Left - distance, PositionY + Height/2);
+           default:
+               return new Vector2(0, 0);
+        }
+    }
 }

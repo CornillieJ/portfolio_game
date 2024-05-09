@@ -13,6 +13,7 @@ public class GameService
     private List<GameObject> _graphicObjects;
     private List<GameObject> _floors;
     private List<Window> _windows;
+    private List<IInteractable> _interactables;
 
     private WindowCreator _windowCreator;
     public Player _playerOne { get; set; }
@@ -21,6 +22,7 @@ public class GameService
     public IEnumerable<GameObject> GraphicObjects => _graphicObjects.AsReadOnly();
     public IEnumerable<GameObject> Floors => _floors.AsReadOnly();
     public IEnumerable<Window> Windows => _windows.AsReadOnly();
+    public IEnumerable<IInteractable> Interactables => _interactables.AsReadOnly();
     public GameService(int screenWidth, int screenHeight)
     {
         _windowCreator = new WindowCreator(screenWidth,screenHeight);
@@ -29,6 +31,7 @@ public class GameService
         _graphicObjects = new List<GameObject>();
         _floors = new List<GameObject>();
         _windows = new List<Window>();
+        _interactables = new List<IInteractable>();
         ScreenSize = new Vector2(screenWidth,screenHeight);
         GetFloor();
         SeedGraphicObjects();
@@ -132,5 +135,41 @@ public class GameService
     public void AddWindow(Window window)
     {
         _windows.Add(window);
+    }
+
+    public GameObject? GetObjectAtLocation(Vector2 location)
+    {
+        foreach (var gameObject in Objects)
+        {
+            if (location.X >= gameObject.Left && location.X <= gameObject.Right && location.Y >= gameObject.Top && location.Y <= gameObject.Bottom)
+                return gameObject;
+        }
+
+        return null;
+    }
+
+    public GameObject? GetObjectPlayerIsLookingAt()
+    {
+        Vector2 location = _playerOne.GetVisionCoordinate();
+        return GetObjectAtLocation(location);
+    }
+
+    public void AddInteraction(IInteractable interactable)
+    {
+        _interactables.Add(interactable);
+    }
+    public void RemoveInteraction(IInteractable interactable)
+    {
+        if(_interactables.Contains(interactable))
+            _interactables.Remove(interactable);
+    }
+    public void InteractAll()
+    {
+        while(_interactables.Any())
+        {
+            var interactText = _interactables[0].Interact();
+            _windows.Add( _windowCreator.GetTextWindow(interactText.Item1,interactText.Item2));
+            _interactables.RemoveAt(0);
+        }
     }
 }

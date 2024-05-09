@@ -57,7 +57,6 @@ public class Game1 : Game
 
     protected override void Update(GameTime gameTime)
     {
-        Player player = _gameService._playerOne;
         var kstate = Keyboard.GetState();
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
             kstate.IsKeyDown(Keys.Escape))
@@ -78,37 +77,18 @@ public class Game1 : Game
             return;
         }
         //Only check input up to here if there are open text windows (no walking allowed if open)
-        PlayerState newPlayerState = PlayerState.Neutral;
-        if (kstate.IsKeyDown(Keys.W))
+        Player player = _gameService._playerOne;
+        MovePlayerOnInput(gameTime, kstate);
+        if ((kstate.IsKeyDown(Keys.Space) || kstate.IsKeyDown(Keys.Enter)) && _isActionPressed == false)
         {
-            newPlayerState = PlayerState.Up;
-            bool canMove = _gameService.CanMove(player, Direction.Up, (float)gameTime.ElapsedGameTime.TotalSeconds);
-            player.GoUp((float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
+            _isActionPressed = true;
+           var gameObjectInView = _gameService.GetObjectPlayerIsLookingAt();
+            if (gameObjectInView is IInteractable interactable)
+                _gameService.AddInteraction(interactable);
         }
-        if (kstate.IsKeyDown(Keys.S))
-        {
-            newPlayerState = PlayerState.Down;
-            bool canMove = _gameService.CanMove(player, Direction.Down, (float)gameTime.ElapsedGameTime.TotalSeconds);
-            player.GoDown((float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
-        }
-
-        if (kstate.IsKeyDown(Keys.A))
-        {
-            newPlayerState = PlayerState.Left;
-            bool canMove = _gameService.CanMove(player, Direction.Left,(float)gameTime.ElapsedGameTime.TotalSeconds);
-            player.GoLeft((float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
-        }
-
-        if (kstate.IsKeyDown(Keys.D))
-        {
-            newPlayerState = PlayerState.Right;
-            bool canMove = _gameService.CanMove(player, Direction.Right,(float)gameTime.ElapsedGameTime.TotalSeconds);
-            player.GoRight((float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
-        }
-        player.PlayerState = newPlayerState; 
+        _gameService.InteractAll();
         base.Update(gameTime);
     }
-
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
@@ -176,5 +156,37 @@ public class Game1 : Game
         var sourceRectangle = gameObject.CurrentSprite;
         var color = Color.White;
         _spriteBatch.Draw(texture,vector2,sourceRectangle,color); 
+    }
+    private void MovePlayerOnInput(GameTime gameTime, KeyboardState kstate)
+    {
+        Player player = _gameService._playerOne;
+        PlayerState newPlayerState = PlayerState.Neutral;
+        if (kstate.IsKeyDown(Keys.W))
+        {
+            newPlayerState = PlayerState.Up;
+            bool canMove = _gameService.CanMove(player, Direction.Up, (float)gameTime.ElapsedGameTime.TotalSeconds);
+            player.GoUp((float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
+        }
+        if (kstate.IsKeyDown(Keys.S))
+        {
+            newPlayerState = PlayerState.Down;
+            bool canMove = _gameService.CanMove(player, Direction.Down, (float)gameTime.ElapsedGameTime.TotalSeconds);
+            player.GoDown((float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
+        }
+
+        if (kstate.IsKeyDown(Keys.A))
+        {
+            newPlayerState = PlayerState.Left;
+            bool canMove = _gameService.CanMove(player, Direction.Left,(float)gameTime.ElapsedGameTime.TotalSeconds);
+            player.GoLeft((float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
+        }
+
+        if (kstate.IsKeyDown(Keys.D))
+        {
+            newPlayerState = PlayerState.Right;
+            bool canMove = _gameService.CanMove(player, Direction.Right,(float)gameTime.ElapsedGameTime.TotalSeconds);
+            player.GoRight((float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
+        }
+        player.PlayerState = newPlayerState;
     }
 }

@@ -14,5 +14,6 @@ public abstract class GameObject
     public int Left => PositionX;
     public int Top => PositionY;
     public int Bottom => PositionY + Height;
+    public Vector2 Middle => new Vector2(PositionX+Width/2, PositionY + Height/2);
     
 }
