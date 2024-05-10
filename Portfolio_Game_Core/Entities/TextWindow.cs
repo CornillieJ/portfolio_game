@@ -12,73 +12,23 @@ public class TextWindow:Window, IVisible
     public static int TextWindowHeight => 200;
     public static int TextWindowWidth => 720;
     public static Texture2D Texture { get; set; }
-    private int _marginX = 48;
-    private int _marginTitle = 10;
-    private int _marginY = 48;
-    public List<Text> _content;
-    public List<Text> _title;
+    private List<Text>? _content;
     public IEnumerable<Text> Content => _content.AsReadOnly();
-    public IEnumerable<Text> Title => _title.AsReadOnly();
 
-    public TextWindow(int x, int y, string title, string content, bool isTest = false) : base(x, y, title)
+    public TextWindow(int x, int y, string title, string content) : base(x, y, title)
     {
+        TextMarginX = 48;
+        TextMarginY = 48;
         Width = TextWindowWidth;
         Height = TextWindowHeight;
         PositionX = x;
         PositionY = y;
         CurrentSprite = new Rectangle(0, 0, Width, Height);
-        _content = GetText(content);
-        _title = GetTitle(title);
-        if (isTest) _content = GetTestText();
+        _content = GetText(TextWindowWidth,TextWindowHeight,content);
     }
+    
 
-    private List<Text> GetTestText()
-    {
-        return GetText( String.Join("", Letter._chars));
-    }
-    private List<Text> GetText(string content)
-    {
-        List<Text> result = new();
-        int textX = PositionX + _marginX;
-        int textY = PositionY + _marginY;
-        string[] words = content.Split(' ');
-        foreach (string word in words)
-        {
-            if (textX + word.Length * Text.TextWidth >= PositionX + TextWindowWidth - _marginX)
-            {
-                textX = PositionX + _marginX;
-                textY += Text.TextHeight;
-            }
-            foreach (char c in word)
-            {
-                if (c == 'i') textX -= Text.TextWidth - Text.TextWidthSmall;
-                if (int.TryParse(c.ToString(), out int value))
-                    result.Add(new Number(textX, textY, c));
-                else
-                    result.Add(new Letter(textX, textY, c));
-                textX += c=='i' ? Text.TextWidthSmall : Text.TextWidth;
-            }
-            result.Add(new Letter(textX, textY, ' ')); 
-            textX += Text.TextWidth;
-        }
-        return result;
-    }
-
-    public List<Text> GetTitle(string title)
-    {
-        List<Text> result = new();
-        int textX = PositionX + _marginTitle; 
-        foreach (char c in title)
-        {
-            if (int.TryParse(c.ToString(), out int value))
-                result.Add(new Number(textX, PositionY, c));
-            else
-                result.Add(new Letter(textX, PositionY, c));
-            textX += Text.TextWidth;
-        }
-
-        return result;
-    }
+    
     
     public Texture2D GetStaticTexture()
     {
