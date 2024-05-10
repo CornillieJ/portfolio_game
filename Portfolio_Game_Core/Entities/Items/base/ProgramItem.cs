@@ -4,9 +4,10 @@ using Portfolio_Game_Core.Interfaces;
 
 namespace Portfolio_Game_Core.Entities.Items;
 
-public class Program:GameItem
+public class ProgramItem:GameItem
 {
-    public Program(int inventoryNumber) : base(inventoryNumber)
+    public string ProgramPath { get; protected set; }
+    public ProgramItem(int inventoryNumber) : base(inventoryNumber)
     {
     }
 }

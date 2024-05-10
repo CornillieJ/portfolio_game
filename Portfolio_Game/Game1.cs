@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -22,8 +23,8 @@ public class Game1 : Game
     private SpriteBatch _spriteBatch;
     private bool _isActionPressed = false;
     private bool _isInventoryPressed= false;
-    private bool _clicked = false;
-
+    private bool _leftClicked = false;
+    private bool _rightClicked = false;
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -104,36 +105,39 @@ public class Game1 : Game
             _isInventoryPressed = false;
         }
 
-        if (mstate.LeftButton == ButtonState.Pressed && _clicked == false)
+        if (mstate.LeftButton == ButtonState.Pressed && _leftClicked == false)
         {
-            _clicked = true;
-            if (_gameService.InventoryWindow.IsOpen)
-            {
-                foreach (var item in _gameService.InventoryWindow.Inventory)
-                {
-                    if (mstate.X >= item.Left && mstate.X <= item.Right
-                                               && mstate.Y >= item.Top && mstate.Y <= item.Bottom)
-                    {
-                       _gameService.InventoryWindow.ShowDescription(item);
-                       break;
-                    }
-                    _gameService.InventoryWindow.HideDescription();
-                }
-            }
-
-            if (_gameService.InventoryWindow.Description is not null)
-            {
-                _gameService.AddTextWindow("Description",_gameService.InventoryWindow.DescriptionText);
-            }
+            if (GetItemUnderMouse(mstate) is GameItem item)
+                _gameService.AddTextWindow("Description",item.Description);
         }
-        if (mstate.LeftButton == ButtonState.Released)
+        if (mstate.RightButton == ButtonState.Pressed && _rightClicked == false)
         {
-            _clicked = false;
+            if (GetItemUnderMouse(mstate) is ProgramItem program)
+                RunProgram(program.ProgramPath);
         }
+        _leftClicked = mstate.LeftButton == ButtonState.Pressed;
+        _rightClicked = mstate.RightButton == ButtonState.Pressed;
         _gameService.InteractAll();
         _gameService.MoveInventoryOnPlayerPosition();
         base.Update(gameTime);
     }
+
+    private GameItem GetItemUnderMouse(MouseState mstate)
+    {
+        if (_gameService.InventoryWindow.IsOpen)
+        {
+            foreach (var item in _gameService.InventoryWindow.Inventory)
+            {
+                if (mstate.X >= item.Left && mstate.X <= item.Right
+                                          && mstate.Y >= item.Top && mstate.Y <= item.Bottom)
+                {
+                    return item;
+                }
+            }
+        }
+        return null;
+    }
+
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
@@ -273,5 +277,17 @@ public class Game1 : Game
             _gameService._playerOne.GoRight((float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
         }
         _gameService._playerOne.PlayerState = newPlayerState;
+    }
+
+    private void RunProgram(string programPath)
+    {
+        try
+        {
+            Process.Start(programPath);
+        }
+        catch (Exception ex)
+        {
+            _gameService.AddTextWindow("Error","Could not start program: " + ex.Message.Substring(0,20));
+        }
     }
 }
