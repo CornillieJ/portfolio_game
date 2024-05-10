@@ -151,43 +151,41 @@ public class Game1 : Game
     }
     private void DrawObject(GameObject gameObject)
     {
-        if (gameObject is not IVisible iVisible) return;
-        Texture2D texture= iVisible.GetStaticTexture();
-        Vector2 vector2 = new(gameObject.PositionX, gameObject.PositionY);
-        var sourceRectangle = gameObject.CurrentSprite;
-        var color = Color.White;
-        _spriteBatch.Draw(texture,vector2,sourceRectangle,color); 
+        if (gameObject is not IVisible visible ) return;
+        _spriteBatch.Draw(visible.GetStaticTexture()
+                    , new Vector2(gameObject.PositionX, gameObject.PositionY)
+                    ,gameObject.CurrentSprite
+                    , Color.White); 
     }
     private void MovePlayerOnInput(GameTime gameTime, KeyboardState kstate)
     {
-        Player player = _gameService._playerOne;
         PlayerState newPlayerState = PlayerState.Neutral;
         if (kstate.IsKeyDown(Keys.W))
         {
             newPlayerState = PlayerState.Up;
-            bool canMove = _gameService.CanMove(player, Direction.Up, (float)gameTime.ElapsedGameTime.TotalSeconds);
-            player.GoUp((float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
+            bool canMove = _gameService.CanMove(_gameService._playerOne, Direction.Up, (float)gameTime.ElapsedGameTime.TotalSeconds);
+            _gameService._playerOne.GoUp((float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
         }
         if (kstate.IsKeyDown(Keys.S))
         {
             newPlayerState = PlayerState.Down;
-            bool canMove = _gameService.CanMove(player, Direction.Down, (float)gameTime.ElapsedGameTime.TotalSeconds);
-            player.GoDown((float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
+            bool canMove = _gameService.CanMove(_gameService._playerOne, Direction.Down, (float)gameTime.ElapsedGameTime.TotalSeconds);
+            _gameService._playerOne.GoDown((float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
         }
 
         if (kstate.IsKeyDown(Keys.A))
         {
             newPlayerState = PlayerState.Left;
-            bool canMove = _gameService.CanMove(player, Direction.Left,(float)gameTime.ElapsedGameTime.TotalSeconds);
-            player.GoLeft((float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
+            bool canMove = _gameService.CanMove(_gameService._playerOne, Direction.Left,(float)gameTime.ElapsedGameTime.TotalSeconds);
+            _gameService._playerOne.GoLeft((float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
         }
 
         if (kstate.IsKeyDown(Keys.D))
         {
             newPlayerState = PlayerState.Right;
-            bool canMove = _gameService.CanMove(player, Direction.Right,(float)gameTime.ElapsedGameTime.TotalSeconds);
-            player.GoRight((float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
+            bool canMove = _gameService.CanMove(_gameService._playerOne, Direction.Right,(float)gameTime.ElapsedGameTime.TotalSeconds);
+            _gameService._playerOne.GoRight((float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
         }
-        player.PlayerState = newPlayerState;
+        _gameService._playerOne.PlayerState = newPlayerState;
     }
 }
