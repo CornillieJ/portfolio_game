@@ -17,6 +17,10 @@ public class GameItem
     public int ItemPositionX { get; set; }
     public int PositionX { get; set; }
     public int PositionY { get; set; }
+    public int Right => PositionX + ItemWidth;
+    public int Left => PositionX;
+    public int Top => PositionY;
+    public int Bottom => PositionY + ItemHeight;
     public Rectangle CurrentSprite { get; protected set; }
     public GameItem(int inventoryNumber)
     {

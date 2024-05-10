@@ -15,6 +15,7 @@ public class InventoryWindow:Window,IVisible
     public bool IsOpen { get; set; }
     public List<GameItem> Inventory { get; set; }
     public List<Text>? Description { get; set; }
+    public string DescriptionText { get; set; }
 
     public InventoryWindow(int x, int y) : base(x, y, "Inventory")
     {
@@ -38,9 +39,10 @@ public class InventoryWindow:Window,IVisible
 
     public void ShowDescription(GameItem item)
     {
+        DescriptionText = item.Description;
         Description = GetText(225, 127, item.Description);
     }
-    public void HideDescription(GameItem item)
+    public void HideDescription()
     {
         Description = null;
     }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -21,6 +22,7 @@ public class Game1 : Game
     private SpriteBatch _spriteBatch;
     private bool _isActionPressed = false;
     private bool _isInventoryPressed= false;
+    private bool _clicked = false;
 
     public Game1()
     {
@@ -63,6 +65,7 @@ public class Game1 : Game
     protected override void Update(GameTime gameTime)
     {
         var kstate = Keyboard.GetState();
+        var mstate = Mouse.GetState();
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
             kstate.IsKeyDown(Keys.Escape))
             Exit();
@@ -82,7 +85,6 @@ public class Game1 : Game
             return;
         }
         //Only check input up to here if there are open text windows (no walking allowed if open)
-        Player player = _gameService._playerOne;
         MovePlayerOnInput(gameTime, kstate);
         if ((kstate.IsKeyDown(Keys.Space) || kstate.IsKeyDown(Keys.Enter)) && _isActionPressed == false)
         {
@@ -101,6 +103,33 @@ public class Game1 : Game
         {
             _isInventoryPressed = false;
         }
+
+        if (mstate.LeftButton == ButtonState.Pressed && _clicked == false)
+        {
+            _clicked = true;
+            if (_gameService.InventoryWindow.IsOpen)
+            {
+                foreach (var item in _gameService.InventoryWindow.Inventory)
+                {
+                    if (mstate.X >= item.Left && mstate.X <= item.Right
+                                               && mstate.Y >= item.Top && mstate.Y <= item.Bottom)
+                    {
+                       _gameService.InventoryWindow.ShowDescription(item);
+                       break;
+                    }
+                    _gameService.InventoryWindow.HideDescription();
+                }
+            }
+
+            if (_gameService.InventoryWindow.Description is not null)
+            {
+                _gameService.AddTextWindow("Description",_gameService.InventoryWindow.DescriptionText);
+            }
+        }
+        if (mstate.LeftButton == ButtonState.Released)
+        {
+            _clicked = false;
+        }
         _gameService.InteractAll();
         _gameService.MoveInventoryOnPlayerPosition();
         base.Update(gameTime);
@@ -114,8 +143,6 @@ public class Game1 : Game
         DrawGameObjects();
         DrawObject(_gameService._playerOne);
         DrawWindows();
-        if (_gameService.InventoryWindow.IsOpen)
-            DrawInventory();
         _spriteBatch.End();
 
         base.Draw(gameTime);
@@ -161,6 +188,7 @@ public class Game1 : Game
         if (!_gameService.InventoryWindow.IsOpen) return;
         DrawObject(_gameService.InventoryWindow);
         DrawObjects(_gameService.InventoryWindow.Title);
+        DrawInventory();
     }
     private void DrawInventory()
     {
@@ -170,7 +198,13 @@ public class Game1 : Game
         }
     }
 
-
+    private void DrawText(IEnumerable<GameObject> gameObjects, float scale)
+    {
+        foreach (var gameObject in gameObjects)
+        {
+            DrawObjectWithScale(gameObject, scale);
+        }
+    }
     private void DrawObjects(IEnumerable<GameObject> gameObjects)
     {
         foreach (var gameObject in gameObjects)
@@ -185,6 +219,21 @@ public class Game1 : Game
                     , new Vector2(gameObject.PositionX, gameObject.PositionY)
                     ,gameObject.CurrentSprite
                     , Color.White); 
+    }
+    private void DrawObjectWithScale(GameObject gameObject, float scale)
+    {
+        if (gameObject is not IVisible visible ) return;
+        _spriteBatch.Draw(
+            visible.GetStaticTexture(),
+            new Vector2(gameObject.PositionX, gameObject.PositionY),
+            null,
+            Color.White,
+            0f,
+            new Vector2(0,0),
+            scale,
+            SpriteEffects.None,
+            0f
+        );
     }
     private void DrawObject(GameItem gameItem)
     {

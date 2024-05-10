@@ -105,7 +105,10 @@ public class GameService
     {
         CurrentMap.Windows.Add(window);
     }
-
+    public void AddTextWindow(string title, string content)
+    {
+        CurrentMap.Windows.Add( _windowCreator.GetTextWindow(title,content));
+    }
     public GameObject? GetObjectAtLocation(Vector2 location)
     {
         foreach (var gameObject in CurrentMap.Objects)
