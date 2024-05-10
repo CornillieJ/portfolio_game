@@ -1,6 +1,7 @@
 ﻿using Portfolio_Game_Core.Data;
 using Portfolio_Game_Core.Entities;
 using Portfolio_Game_Core.Entities.Graphical;
+using Portfolio_Game_Core.Entities.Items;
 using Portfolio_Game_Core.Helpers;
 using Portfolio_Game_Core.Interfaces;
 
@@ -12,9 +13,16 @@ public class FirstMap:Map
     {
         GetFloor();
         SeedGraphicObjects();
+        SeedObjects();
         SeedStartText();
         SeedWalls();
     }
+
+    private void SeedObjects()
+    {
+        Objects.Add(new Chest(50,50, new Tankie(0)));
+    }
+
     private void GetFloor()
     {
         int width = Floor.FloorWidth; 
@@ -40,7 +48,6 @@ public class FirstMap:Map
 
     private void SeedWalls()
     {
-        int width = Wall.WallWidth;
         int height = Wall.WallHeight;
         var walls = MapHelper.GetWallsSurroundingMap(ScreenSize);
         walls.AddRange(new List<Wall>()

@@ -1,7 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.ComponentModel.Design;
+using Microsoft.Xna.Framework;
 using Portfolio_Game_Core.Data;
 using Portfolio_Game_Core.Entities;
+using Portfolio_Game_Core.Entities.Base;
 using Portfolio_Game_Core.Entities.Graphical;
+using Portfolio_Game_Core.Font;
 using Portfolio_Game_Core.Interfaces;
 using Portfolio_Game_Core.Maps;
 
@@ -14,6 +17,7 @@ public class GameService
     public Player _playerOne { get; set; }
     public Vector2 ScreenSize { get; }
     public Map CurrentMap { get; set; }
+    public InventoryWindow InventoryWindow { get; set; }
 
     public GameService(int screenWidth, int screenHeight)
     {
@@ -21,6 +25,7 @@ public class GameService
         _windowCreator = new WindowCreator(screenWidth,screenHeight);
         _playerOne = new Player(0, 0);
         CurrentMap = new FirstMap(screenWidth,screenHeight);
+        InventoryWindow = new InventoryWindow(screenWidth/2 + 50, screenHeight/2 - InventoryWindow.InventoryWindowHeight/2);
     }
 
     public void AddObject(GameObject gameObject)
@@ -131,9 +136,40 @@ public class GameService
     {
         while(CurrentMap.Interactables.Any())
         {
-            var interactText = CurrentMap.Interactables[0].Interact();
-            CurrentMap.Windows.Add( _windowCreator.GetTextWindow(interactText.Item1,interactText.Item2));
+            (string? title, string? content, GameItem? item) = CurrentMap.Interactables[0].Interact();
+            if(title is not null && content is not null )
+                CurrentMap.Windows.Add( _windowCreator.GetTextWindow(title,content));
+            if (item is not null)
+            {
+                AddToInventory(item);
+            }
             CurrentMap.Interactables.RemoveAt(0);
         }
+    }
+
+    public void MoveInventoryOnPlayerPosition()
+    {
+        int difference = 0;
+        if (_playerOne.PositionX > ScreenSize.X / 2 && InventoryWindow.location == Direction.Right)
+        {
+            difference = -(int)ScreenSize.X / 2;
+            InventoryWindow.location = Direction.Left;
+        }
+        else if(_playerOne.PositionX < ScreenSize.X / 2 && InventoryWindow.location == Direction.Left)
+        {
+            difference = (int)ScreenSize.X / 2;
+            InventoryWindow.location = Direction.Right;
+        }
+        InventoryWindow.PositionX += difference;
+        InventoryWindow.Title = InventoryWindow.Title.Select(c => { c.PositionX += difference; return c; });
+        InventoryWindow.Description = InventoryWindow.Description?.Select(c => { c.PositionX += difference; return c; }).ToList();
+        InventoryWindow.Inventory = InventoryWindow.Inventory.Select(i => { i.PositionX += difference; return i; }).ToList();
+    }
+    public void AddToInventory(GameItem item)
+    {
+        item.InventoryNumber = InventoryWindow.Inventory.Count;
+        item.PositionX = item.ItemPositionX + InventoryWindow.PositionX;
+        item.PositionY = item.ItemPositionY + InventoryWindow.PositionY;
+        InventoryWindow.Inventory.Add(item);
     }
 }

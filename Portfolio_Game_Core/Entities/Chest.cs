@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Portfolio_Game_Core.Entities.Base;
 using Portfolio_Game_Core.Interfaces;
 using Portfolio_Game_Core.Services;
 
@@ -8,10 +9,11 @@ namespace Portfolio_Game_Core.Entities;
 public class Chest:GameObject, IInteractable, IVisible
 {
     private static Texture2D Texture { get; set; }
-    private static int ChestWidth => 30;
-    private static int ChestHeight => 25;
-    private List<GameObject> _inventory;
-    public IEnumerable<GameObject> Inventory
+    private static int ChestWidth => 28;
+    private static int ChestHeight => 27;
+    private List<GameItem> _inventory;
+    private bool _isOpen = false;
+    public IEnumerable<GameItem> Inventory
     {
         get => _inventory.AsReadOnly();
     }
@@ -21,8 +23,13 @@ public class Chest:GameObject, IInteractable, IVisible
         Height = ChestHeight;
         PositionX = x;
         PositionY = y;
-        CurrentSprite = new Rectangle(0, 1, Width, Height);
-        _inventory = new List<GameObject>();
+        CurrentSprite = new Rectangle(0, 0, Width, Height);
+        _inventory = new List<GameItem>();
+    }
+
+    public Chest(int x, int y, GameItem item) : this(x, y)
+    {
+        _inventory.Add(item);
     }
     public Texture2D GetStaticTexture()
     {
@@ -32,13 +39,16 @@ public class Chest:GameObject, IInteractable, IVisible
     {
         Texture = texture;
     }
-    public (string,string) Interact()
+    public (string,string, GameItem) Interact()
     {
-        return ("chest", "This is a chest with a sword inside");
+        if (_isOpen) return (null,null, null);
+        _isOpen = true;
+        CurrentSprite = new Rectangle(34, 0, Width, Height);
+        return ("chest", "You took a program out of the chest, have a look in your inventory to run it.",_inventory[0]);
     }
 
     public void ShowInventory()
     {
-        
+       //TODO 
     }
 }

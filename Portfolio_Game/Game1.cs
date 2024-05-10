@@ -5,7 +5,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Portfolio_Game_Core;
 using Portfolio_Game_Core.Entities;
+using Portfolio_Game_Core.Entities.Base;
 using Portfolio_Game_Core.Entities.Graphical;
+using Portfolio_Game_Core.Entities.Items;
 using Portfolio_Game_Core.Font;
 using Portfolio_Game_Core.Interfaces;
 using Portfolio_Game_Core.Services;
@@ -18,6 +20,7 @@ public class Game1 : Game
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
     private bool _isActionPressed = false;
+    private bool _isInventoryPressed= false;
 
     public Game1()
     {
@@ -32,7 +35,6 @@ public class Game1 : Game
         Player player = _gameService._playerOne; 
         player.PositionX = _graphics.PreferredBackBufferWidth / 2 - (player.Width/2);
         player.PositionY = _graphics.PreferredBackBufferHeight / 2 - (player.Height/2);
-        _gameService.AddObject(new Chest(50,50));
         base.Initialize();
     }
 
@@ -53,6 +55,8 @@ public class Game1 : Game
         Floor.Texture = Content.Load<Texture2D>("inner");
         Wall.Texture = Content.Load<Texture2D>("inner");
         TextWindow.Texture = Content.Load<Texture2D>("window200");
+        InventoryWindow.Texture = Content.Load<Texture2D>("inventorywindow");
+        Tankie.Texture = Content.Load<Texture2D>("tank");
         Text.Texture = Content.Load<Texture2D>("font2");
     }
 
@@ -87,7 +91,18 @@ public class Game1 : Game
             if (gameObjectInView is IInteractable interactable)
                 _gameService.AddInteraction(interactable);
         }
+
+        if ((kstate.IsKeyDown(Keys.I) || kstate.IsKeyDown(Keys.Tab)) && _isInventoryPressed == false)
+        {
+            _isInventoryPressed = true;
+            _gameService.InventoryWindow.IsOpen = !_gameService.InventoryWindow.IsOpen;
+        }
+        if (!kstate.IsKeyDown(Keys.I) && !kstate.IsKeyDown(Keys.Tab))
+        {
+            _isInventoryPressed = false;
+        }
         _gameService.InteractAll();
+        _gameService.MoveInventoryOnPlayerPosition();
         base.Update(gameTime);
     }
     protected override void Draw(GameTime gameTime)
@@ -99,6 +114,8 @@ public class Game1 : Game
         DrawGameObjects();
         DrawObject(_gameService._playerOne);
         DrawWindows();
+        if (_gameService.InventoryWindow.IsOpen)
+            DrawInventory();
         _spriteBatch.End();
 
         base.Draw(gameTime);
@@ -136,11 +153,23 @@ public class Game1 : Game
             DrawObject(windows[i]);
             if (windows[i] is TextWindow textWindow)
             {
-                DrawObjects(textWindow._title);
+                DrawObjects(textWindow.Title);
                 DrawObjects(textWindow.Content);
             }
         }
+        if (windows.Any()) return;
+        if (!_gameService.InventoryWindow.IsOpen) return;
+        DrawObject(_gameService.InventoryWindow);
+        DrawObjects(_gameService.InventoryWindow.Title);
     }
+    private void DrawInventory()
+    {
+        foreach (var item in _gameService.InventoryWindow.Inventory)
+        {
+           DrawObject(item); 
+        }
+    }
+
 
     private void DrawObjects(IEnumerable<GameObject> gameObjects)
     {
@@ -156,6 +185,14 @@ public class Game1 : Game
                     , new Vector2(gameObject.PositionX, gameObject.PositionY)
                     ,gameObject.CurrentSprite
                     , Color.White); 
+    }
+    private void DrawObject(GameItem gameItem)
+    {
+        if (gameItem is not IVisible visible ) return;
+        _spriteBatch.Draw(visible.GetStaticTexture()
+            , new Vector2(gameItem.PositionX, gameItem.PositionY)
+            ,gameItem.CurrentSprite
+            , Color.White); 
     }
     private void MovePlayerOnInput(GameTime gameTime, KeyboardState kstate)
     {
