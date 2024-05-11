@@ -39,7 +39,7 @@ public class FirstMap:Map
 
     private void SeedGraphicObjects()
     {
-        GraphicObjects.Add(new Carpet((int)(ScreenSize.X/2 - Carpet.carpetWidth/2),(int)(ScreenSize.Y/2 - Carpet.carpetHeight/2)));
+       // GraphicObjects.Add(new Carpet((int)(ScreenSize.X/2 - Carpet.carpetWidth/2),(int)(ScreenSize.Y/2 - Carpet.carpetHeight/2)));
     }
 
     private void SeedStartText()
@@ -77,5 +77,8 @@ public class FirstMap:Map
             new Wall((int)(ScreenSize.X - 250), (int)(ScreenSize.Y - height * 5), Direction.Right,Direction.Up),
         });
         Objects.AddRange(walls);
+        Objects.Add(new WindowInWall(Wall.WallWidth*3,0));
+        Objects.Add(new WindowInWall(Wall.WallWidth*10,0));
+        Objects.Add(new WindowInWall(Wall.WallWidth*17,0));
     }
 }
