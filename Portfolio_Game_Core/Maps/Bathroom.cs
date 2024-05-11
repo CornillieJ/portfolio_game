@@ -33,12 +33,15 @@ public class Bathroom:Map
     }
 
     private void SeedWalls()
-    { 
-       Objects.AddRange(MapHelper.MakeMapSmaller(ScreenSize, 4));
+    {
+        var walls = MapHelper.MakeMapSmaller(ScreenSize, 2,15,2,1);
+       walls = walls.Where(w=>Math.Abs(w.Middle.Y - ScreenSize.Y/2) > 5 || w.Left > 150).ToList();
+       Objects.AddRange(walls);
+
     }
 
     public override void GetEntryLocation(Direction entryDirection)
     {
-        EntryLocation = new Vector2((int)(ScreenSize.X / 2 - (float)Player.PlayerWidth/2), (int)(ScreenSize.Y / 2 - (float)Player.PlayerHeight/2));
+        EntryLocation = new Vector2(15, (int)(ScreenSize.Y / 2 - (float)Player.PlayerHeight/2));
     }
 }

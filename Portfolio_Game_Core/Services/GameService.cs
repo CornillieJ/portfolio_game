@@ -180,7 +180,7 @@ public class GameService
     {
         foreach (var exit in CurrentMap.MapExits.Keys)
         {
-            if (Math.Abs(_playerOne.Middle.X - exit.X) < 25 && Math.Abs(_playerOne.Middle.Y - exit.Y) < 15)
+            if (Math.Abs(_playerOne.Middle.X - exit.X) < 25 && Math.Abs(_playerOne.Middle.Y - exit.Y) < 25)
             {
                 var lastMap = CurrentMap;
                 CurrentMap = CurrentMap.MapExits[exit].Item1??CurrentMap;
