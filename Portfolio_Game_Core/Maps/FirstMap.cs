@@ -25,15 +25,16 @@ public class FirstMap:Map
 
     private void GetFloor()
     {
-        int width = Floor.FloorWidth; 
-        int height = Floor.FloorHeight; 
-        for (int i = 0; i < ScreenSize.Y; i++)
-        {
-            for (int j = 0; j < ScreenSize.X; j++)
-            {
-                Floors.Add(new Floor(j*width,i*height));
-            }
-        }
+        Floor = new Floor(0,0);
+        // int width = FloorTile.FloorWidth; 
+        // int height = FloorTile.FloorHeight; 
+        // for (int i = 0; i < ScreenSize.Y; i++)
+        // {
+        //     for (int j = 0; j < ScreenSize.X; j++)
+        //     {
+        //         Floors.Add(new FloorTile(j*width,i*height));
+        //     }
+        // }
     }
 
     private void SeedGraphicObjects()

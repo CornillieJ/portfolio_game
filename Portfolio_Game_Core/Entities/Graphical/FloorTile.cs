@@ -4,19 +4,19 @@ using Portfolio_Game_Core.Interfaces;
 
 namespace Portfolio_Game_Core.Entities.Graphical;
 
-public class Floor : GameObject, IVisible
+public class FloorTile : GameObject, IVisible
 {
     public static Texture2D Texture { get; set; }
-    public static int FloorWidth => 800;
-    public static int FloorHeight => 480;
+    public static int FloorWidth => 32;
+    public static int FloorHeight => 32;
 
-    public Floor(int x, int y)
+    public FloorTile(int x, int y)
     {
         Width = FloorWidth;
         Height = FloorHeight;
         PositionX = x;
         PositionY = y;
-        CurrentSprite = new Rectangle(0,0,Width,Height);
+        CurrentSprite = new Rectangle(0,Height,Width,Height);
     }
     public Texture2D GetStaticTexture()
     {

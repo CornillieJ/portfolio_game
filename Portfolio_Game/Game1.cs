@@ -55,7 +55,8 @@ public class Game1 : Game
             iVisible.SetStaticTexture(Content.Load<Texture2D>("inner"));
         }
         Player.Texture = Content.Load<Texture2D>("character");
-        Floor.Texture = Content.Load<Texture2D>("inner");
+        // FloorTile.Texture = Content.Load<Texture2D>("inner");
+        Floor.Texture = Content.Load<Texture2D>("housefloor");
         Wall.Texture = Content.Load<Texture2D>("inner");
         TextWindow.Texture = Content.Load<Texture2D>("window200");
         InventoryWindow.Texture = Content.Load<Texture2D>("inventorywindow");
@@ -142,7 +143,6 @@ public class Game1 : Game
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
         _spriteBatch.Begin();
-        DrawFloors();
         DrawGraphicObjects();
         DrawGameObjects();
         DrawObject(_gameService._playerOne);
@@ -162,19 +162,20 @@ public class Game1 : Game
 
     private void DrawGraphicObjects()
     {
+        DrawObject(_gameService.CurrentMap.Floor);
         foreach (var graphicObject in _gameService.CurrentMap.GraphicObjects)
         {
             DrawObject(graphicObject); 
         }
     }
 
-    private void DrawFloors()
-    {
-        foreach (var floor in _gameService.CurrentMap.Floors)
-        {
-            DrawObject(floor); 
-        }
-    }
+    // private void DrawFloors()
+    // {
+    //     foreach (var floor in _gameService.CurrentMap.Floors)
+    //     {
+    //         DrawObject(floor); 
+    //     }
+    // }
 
     private void DrawWindows()
     {
