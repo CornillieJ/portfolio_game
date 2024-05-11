@@ -15,7 +15,7 @@ public class TextWindow:Window, IVisible
     private List<Text>? _content;
     public IEnumerable<Text> Content => _content.AsReadOnly();
 
-    public TextWindow(int x, int y, string title, string content) : base(x, y, title)
+    public TextWindow(float x, float y, string title, string content) : base(x, y, title)
     {
         TextMarginX = 48;
         TextMarginY = 48;

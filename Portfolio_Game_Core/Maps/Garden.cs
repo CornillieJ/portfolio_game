@@ -4,13 +4,12 @@ using Portfolio_Game_Core.Entities;
 using Portfolio_Game_Core.Entities.Graphical;
 using Portfolio_Game_Core.Entities.Items;
 using Portfolio_Game_Core.Helpers;
-using Portfolio_Game_Core.Interfaces;
 
 namespace Portfolio_Game_Core.Maps;
 
-public class FirstMap:Map
+public class Garden:Map
 {
-    public FirstMap(int screenWidth, int screenHeight) : base(screenWidth, screenHeight)
+    public Garden(float screenWidth, float screenHeight) : base(screenWidth, screenHeight)
     {
         SeedNextMaps();
         GetFloor();
@@ -19,13 +18,8 @@ public class FirstMap:Map
         SeedStartText();
         SeedWalls();
     }
-
-    private void SeedNextMaps()
+     private void SeedNextMaps()
     {
-        Garden garden = new Garden(ScreenSize.X,ScreenSize.Y);
-        Bathroom bathroom = new Bathroom(ScreenSize.X,ScreenSize.Y);
-        MapExits.Add(new Vector2(ScreenSize.X/2,5),(garden,Direction.Up));
-        MapExits.Add(new Vector2(ScreenSize.X,ScreenSize.Y/2),(bathroom,Direction.Right));
     }
 
     private void SeedObjects()
@@ -36,6 +30,15 @@ public class FirstMap:Map
     private void GetFloor()
     {
         Floor = new Floor(0,0);
+        // int width = FloorTile.FloorWidth; 
+        // int height = FloorTile.FloorHeight; 
+        // for (int i = 0; i < ScreenSize.Y; i++)
+        // {
+        //     for (int j = 0; j < ScreenSize.X; j++)
+        //     {
+        //         Floors.Add(new FloorTile(j*width,i*height));
+        //     }
+        // }
     }
 
     private void SeedGraphicObjects()
@@ -45,7 +48,6 @@ public class FirstMap:Map
 
     private void SeedStartText()
     {
-        Windows.AddRange(_windowCreator.GetTextWindows(new List<string>{ "Welcome"} , TextData.WelcomeTexts));
     }
 
     private void SeedWalls()
@@ -86,17 +88,6 @@ public class FirstMap:Map
 
     public override void GetEntryLocation(Direction entryDirection)
     {
-        switch (entryDirection)
-        {
-            case Direction.Down:
-                EntryLocation = new Vector2((int)(ScreenSize.X / 2 - (float)Player.PlayerWidth/2), 10);
-                break;
-            case Direction.Left:
-                EntryLocation = new Vector2(ScreenSize.X - 10, (int)(ScreenSize.Y / 2 - (float)Player.PlayerHeight/2));
-                break;
-            case Direction.Neutral:
-                EntryLocation = new Vector2((int)(ScreenSize.X / 2 - (float)Player.PlayerWidth/2), (int)(ScreenSize.Y / 2 - (float)Player.PlayerHeight/2));
-                break;
-        } 
+        EntryLocation = new Vector2((int)(ScreenSize.X / 2 - (float)Player.PlayerWidth/2), (int)(ScreenSize.Y / 2 - (float)Player.PlayerHeight/2));
     }
 }

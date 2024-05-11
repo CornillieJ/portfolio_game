@@ -10,10 +10,12 @@ public abstract class GameObject
     public int Width { get; internal set; }
     public int Height { get; internal set; }
     public Rectangle CurrentSprite { get; protected set; }
-    public float Right => PositionX + Width;
-    public float Left => PositionX;
-    public float Top => PositionY;
-    public float Bottom => PositionY + Height;
+    public float Right => PositionX + Width - HitBoxMargin;
+    public float HitBoxMargin { get; protected set; } = 5;
+
+    public float Left => PositionX + HitBoxMargin;
+    public float Top => PositionY + HitBoxMargin;
+    public float Bottom => PositionY + Height- HitBoxMargin;
     public Vector2 Middle => new(PositionX+Width/2, PositionY + Height/2);
     
 }

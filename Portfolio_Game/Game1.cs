@@ -283,6 +283,10 @@ public class Game1 : Game
             _gameService._playerOne.GoRight((float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
         }
         _gameService._playerOne.PlayerState = newPlayerState;
+        if (newPlayerState != PlayerState.Neutral)
+        {
+            _gameService.ChangeMapIfNecessary();
+        }
     }
 
     private void RunProgram(string programPath)

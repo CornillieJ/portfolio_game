@@ -12,7 +12,7 @@ namespace Portfolio_Game_Core.Services;
 
 public class GameService
 {
-    private int _topMargin = 40;
+    private int _topMargin = 35;
     private WindowCreator _windowCreator;
     public Player _playerOne { get; set; }
     public Vector2 ScreenSize { get; }
@@ -174,5 +174,21 @@ public class GameService
         item.PositionX = item.ItemPositionX + InventoryWindow.PositionX;
         item.PositionY = item.ItemPositionY + InventoryWindow.PositionY;
         InventoryWindow.Inventory.Add(item);
+    }
+
+    public void ChangeMapIfNecessary()
+    {
+        foreach (var exit in CurrentMap.MapExits.Keys)
+        {
+            if (Math.Abs(_playerOne.Middle.X - exit.X) < 25 && Math.Abs(_playerOne.Middle.Y - exit.Y) < 15)
+            {
+                var lastMap = CurrentMap;
+                CurrentMap = CurrentMap.MapExits[exit].Item1??CurrentMap;
+                CurrentMap.GetEntryLocation(lastMap.MapExits[exit].Item2);
+                _playerOne.PositionX = CurrentMap.EntryLocation.X;
+                _playerOne.PositionY = CurrentMap.EntryLocation.Y;
+            }
+            
+        }
     }
 }

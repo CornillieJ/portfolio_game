@@ -6,27 +6,28 @@ using Portfolio_Game_Core.Services;
 
 namespace Portfolio_Game_Core.Maps;
 
-public class Map
+public abstract class Map
 {
-    public List<GameObject> Objects{get; set;}
-    public List<GameObject> GraphicObjects{get; set;}
-    //public List<GameObject> Floors{get; set;}
-    //public FloorTile FloorTile { get; set; }
-    public List<Window> Windows{get; set;}
-    public List<IInteractable> Interactables{get; set;}
+    public Dictionary<Vector2, (Map?,Direction)> MapExits = new();
+    public List<GameObject> Objects { get; set; }
+    public List<GameObject> GraphicObjects { get; set; }
+    public List<Window> Windows { get; set; }
+    public List<IInteractable> Interactables { get; set; }
 
-    public WindowCreator _windowCreator;
-    public Vector2 ScreenSize { get; }
+    protected WindowCreator _windowCreator;
+    protected Vector2 ScreenSize { get; set; }
     public Floor Floor { get; set; }
+    public Vector2 EntryLocation { get; set; }
 
-    public Map(int screenWidth, int screenHeight)
+    public Map(float screenWidth, float screenHeight, Direction entryDirection = Direction.Neutral)
     {
         ScreenSize = new Vector2(screenWidth, screenHeight);
         Objects = new List<GameObject>();
         GraphicObjects = new List<GameObject>();
-        //Floors = new List<GameObject>();
         Windows = new List<Window>();
         Interactables = new List<IInteractable>();
-        _windowCreator = new WindowCreator(screenWidth,screenHeight);
+        _windowCreator = new WindowCreator(screenWidth, screenHeight);
     }
+
+    public abstract void GetEntryLocation(Direction entryDirection);
 }
