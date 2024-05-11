@@ -13,14 +13,14 @@ public class GameItem
     public int ItemWidth { get; set; } = 30;
     public int ItemHeight { get; set; } = 35;
     public int InventoryNumber { get; set; }
-    public int ItemPositionY { get; set; }
-    public int ItemPositionX { get; set; }
-    public int PositionX { get; set; }
-    public int PositionY { get; set; }
-    public int Right => PositionX + ItemWidth;
-    public int Left => PositionX;
-    public int Top => PositionY;
-    public int Bottom => PositionY + ItemHeight;
+    public float ItemPositionY { get; set; }
+    public float ItemPositionX { get; set; }
+    public float PositionX { get; set; }
+    public float PositionY { get; set; }
+    public float Right => PositionX + ItemWidth;
+    public float Left => PositionX;
+    public float Top => PositionY;
+    public float Bottom => PositionY + ItemHeight;
     public Rectangle CurrentSprite { get; protected set; }
     public GameItem(int inventoryNumber)
     {

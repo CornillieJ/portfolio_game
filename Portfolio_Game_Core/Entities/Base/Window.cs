@@ -31,7 +31,7 @@ public class Window:GameObject
     public List<Text> GetTitle(string title)
     {
         List<Text> result = new();
-        int textX = PositionX + TitleMargin; 
+        float textX = PositionX + TitleMargin; 
         foreach (char c in title)
         {
             if (int.TryParse(c.ToString(), out int value))
@@ -46,8 +46,8 @@ public class Window:GameObject
     public List<Text>? GetText(int textWindowWidth, int textWindowHeight,string content)
     {
         List<Text>? result = new();
-        int textX = PositionX + TextMarginX;
-        int textY = PositionY + TextMarginY;
+        float textX = PositionX + TextMarginX;
+        float textY = PositionY + TextMarginY;
         string[] words = content.Split(' ');
         foreach (string word in words)
         {

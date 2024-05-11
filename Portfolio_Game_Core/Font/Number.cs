@@ -12,7 +12,7 @@ public class Number:Text
     private int _numbersStart = 430;
     public static Texture2D Texture { get; set; }
 
-    public Number(int x, int y, char number)
+    public Number(float x, float y, char number)
     {
         Width = NumberWidth;
         Height = NumberHeight;

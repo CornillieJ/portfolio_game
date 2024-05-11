@@ -14,7 +14,7 @@ public class Letter:Text
         '?', '|', '#', '_', '-', '|', ':', ';', '\'', '"', ' '
     };
 
-    public Letter(int x, int y, char letter) 
+    public Letter(float x, float y, char letter) 
     {
         Width = LetterWidth;
         Height = LetterHeight;
