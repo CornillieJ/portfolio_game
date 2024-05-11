@@ -254,23 +254,27 @@ public class Game1 : Game
         {
             newPlayerState = PlayerState.Up;
             bool canMove = _gameService.CanMove(_gameService._playerOne, Direction.Up, (float)gameTime.ElapsedGameTime.TotalSeconds);
-            _gameService._playerOne.GoUp((float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
+            Direction secondDirection = Direction.Neutral;
+            if (kstate.IsKeyDown(Keys.A)) secondDirection = Direction.Left;
+            if (kstate.IsKeyDown(Keys.D)) secondDirection = Direction.Right;
+                _gameService._playerOne.GoUp((float)gameTime.ElapsedGameTime.TotalSeconds, canMove, secondDirection);
         }
-        if (kstate.IsKeyDown(Keys.S))
+        else if (kstate.IsKeyDown(Keys.S))
         {
             newPlayerState = PlayerState.Down;
             bool canMove = _gameService.CanMove(_gameService._playerOne, Direction.Down, (float)gameTime.ElapsedGameTime.TotalSeconds);
-            _gameService._playerOne.GoDown((float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
+            Direction secondDirection = Direction.Neutral;
+            if (kstate.IsKeyDown(Keys.A)) secondDirection = Direction.Left;
+            if (kstate.IsKeyDown(Keys.D)) secondDirection = Direction.Right;
+            _gameService._playerOne.GoDown((float)gameTime.ElapsedGameTime.TotalSeconds, canMove, secondDirection);
         }
-
-        if (kstate.IsKeyDown(Keys.A))
+        else if (kstate.IsKeyDown(Keys.A))
         {
             newPlayerState = PlayerState.Left;
             bool canMove = _gameService.CanMove(_gameService._playerOne, Direction.Left,(float)gameTime.ElapsedGameTime.TotalSeconds);
             _gameService._playerOne.GoLeft((float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
         }
-
-        if (kstate.IsKeyDown(Keys.D))
+        else if (kstate.IsKeyDown(Keys.D))
         {
             newPlayerState = PlayerState.Right;
             bool canMove = _gameService.CanMove(_gameService._playerOne, Direction.Right,(float)gameTime.ElapsedGameTime.TotalSeconds);
@@ -287,7 +291,7 @@ public class Game1 : Game
         }
         catch (Exception ex)
         {
-            _gameService.AddTextWindow("Error","Could not start program: " + ex.Message.Substring(0,20));
+            _gameService.AddTextWindow("Error", string.Concat("Could not start program: ", ex.Message.AsSpan(0,20)));
         }
     }
 }

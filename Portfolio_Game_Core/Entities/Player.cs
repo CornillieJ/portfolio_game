@@ -65,10 +65,14 @@ public class Player: GameObject, IMovable, IVisible
         Direction = Direction.Left;
     }
 
-    public void GoUp(float deltaTime, bool canMove)
+    public void GoUp(float deltaTime, bool canMove, Direction secondDirection = Direction.Neutral)
     {
-        if(canMove)
+        if (canMove)
+        {
             PositionY -= (int) (Speed * deltaTime);
+            if(secondDirection == Direction.Left) PositionX -= (int) (Speed * deltaTime); 
+            if(secondDirection == Direction.Right) PositionX += (int) (Speed * deltaTime);
+        }
         if (Direction == Direction.Up)
             _spriteNumber++;
         else
@@ -77,11 +81,14 @@ public class Player: GameObject, IMovable, IVisible
         CurrentSprite = SpriteData.UpSprites[_spriteNumber/_spriteChangeSpeed];
         Direction = Direction.Up;
     }
-
-    public void GoDown(float deltaTime, bool canMove)
+    public void GoDown(float deltaTime, bool canMove, Direction secondDirection = Direction.Neutral)
     {
-        if(canMove)
+        if (canMove)
+        {
             PositionY += (int) (Speed * deltaTime);
+            if(secondDirection == Direction.Left) PositionX -= (int) (Speed * deltaTime); 
+            if(secondDirection == Direction.Right) PositionX += (int) (Speed * deltaTime);
+        }
         if (Direction == Direction.Down)
             _spriteNumber++;
         else
@@ -107,4 +114,6 @@ public class Player: GameObject, IMovable, IVisible
                return new Vector2(0, 0);
         }
     }
+
+
 }
