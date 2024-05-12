@@ -12,7 +12,7 @@ namespace Portfolio_Game_Core.Services;
 
 public class GameService
 {
-    private int _topMargin = 40;
+    private int _topMargin = 35;
     private WindowCreator _windowCreator;
     public Player _playerOne { get; set; }
     public Vector2 ScreenSize { get; }
@@ -21,11 +21,16 @@ public class GameService
 
     public GameService(int screenWidth, int screenHeight)
     {
+        CurrentMap = MapService.Maps["house-entry"];
         ScreenSize = new Vector2(screenWidth, screenHeight);
         _windowCreator = new WindowCreator(screenWidth,screenHeight);
         _playerOne = new Player(0, 0);
-        CurrentMap = new FirstMap(screenWidth,screenHeight);
         InventoryWindow = new InventoryWindow(screenWidth/2 + 50, screenHeight/2 - InventoryWindow.InventoryWindowHeight/2);
+        foreach (var map in MapService.Maps.Values)
+        {
+            map.SeedNextMaps();
+        }
+        
     }
 
     public void AddObject(GameObject gameObject)
@@ -174,5 +179,23 @@ public class GameService
         item.PositionX = item.ItemPositionX + InventoryWindow.PositionX;
         item.PositionY = item.ItemPositionY + InventoryWindow.PositionY;
         InventoryWindow.Inventory.Add(item);
+    }
+
+    public void ChangeMapIfNecessary(PlayerState playerState)
+    {
+        int precisionX = playerState is PlayerState.Up or PlayerState.Down ? 25 : 5; 
+        int precisionY = playerState is PlayerState.Left or PlayerState.Right ? 25 : 5; 
+        foreach (var exit in CurrentMap.MapExits.Keys)
+        {
+            if (Math.Abs(_playerOne.Middle.X - exit.X) < precisionX && Math.Abs(_playerOne.Middle.Y - exit.Y) < precisionY)
+            {
+                var lastMap = CurrentMap;
+                CurrentMap = CurrentMap.MapExits[exit].Item1??CurrentMap;
+                CurrentMap.GetEntryLocation(lastMap.MapExits[exit].Item2);
+                _playerOne.PositionX = CurrentMap.EntryLocation.X;
+                _playerOne.PositionY = CurrentMap.EntryLocation.Y;
+            }
+            
+        }
     }
 }

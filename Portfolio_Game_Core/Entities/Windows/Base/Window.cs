@@ -19,7 +19,7 @@ public class Window:GameObject
     set => _title = value.ToList();
     }
 
-    public Window(int x, int y, string title)
+    public Window(float x, float y, string title)
     {
         Width = WindowWidth;
         Height = WindowHeight;
@@ -35,9 +35,9 @@ public class Window:GameObject
         foreach (char c in title)
         {
             if (int.TryParse(c.ToString(), out int value))
-                result.Add(new Number(textX, PositionY, c));
+                result.Add(new Number(textX, PositionY+5, c));
             else
-                result.Add(new Letter(textX, PositionY, c));
+                result.Add(new Letter(textX, PositionY+5, c));
             textX += Text.TextWidth;
         }
 
@@ -55,6 +55,12 @@ public class Window:GameObject
             {
                 textX = PositionX + TextMarginX;
                 textY += Text.TextHeight;
+            }
+            if (word == "\n")
+            {
+                textX = PositionX + TextMarginX;
+                textY += Text.TextHeight;
+                continue;
             }
             foreach (char c in word)
             {

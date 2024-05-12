@@ -5,9 +5,9 @@ namespace Portfolio_Game_Core.Services;
 
 public class WindowCreator
 {
-    private int _screenWidth;
-    private int _screenHeight;
-    public WindowCreator(int screenWidth, int screenHeight)
+    private float _screenWidth;
+    private float _screenHeight;
+    public WindowCreator(float screenWidth, float screenHeight)
     {
         _screenHeight = screenHeight;
         _screenWidth = screenWidth;

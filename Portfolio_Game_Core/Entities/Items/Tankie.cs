@@ -11,7 +11,7 @@ public class Tankie:ProgramItem,IVisible, IInteractable
     public Tankie(int inventoryNumber) : base(inventoryNumber)
     {
         ProgramPath =  @"Programs\Tankie\Tankie.exe";
-        Description =  "A tank game made on project day in Howest, right click the icon to run";
+        Description =  "A tank game made on project day in Howest, \n right click the icon to run";
         CurrentSprite = new Rectangle(0, 0, ItemWidth, ItemHeight);
     }
     public Texture2D GetStaticTexture()
