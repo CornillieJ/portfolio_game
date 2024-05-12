@@ -8,6 +8,8 @@ namespace Portfolio_Game_Core.Maps;
 
 public abstract class Map
 {
+    public int Width { get; set; }
+    public int Height { get; set; }
     public Dictionary<Vector2, (Map?,Direction)> MapExits = new();
     public List<GameObject> Objects { get; set; }
     public List<GameObject> GraphicObjects { get; set; }

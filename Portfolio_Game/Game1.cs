@@ -18,6 +18,8 @@ namespace Portfolio_Game;
 
 public class Game1 : Game
 {
+    float _zoomFactor = 1.0f;
+    private float _lastScrollWheelValue = 0;
     private GameService _gameService;
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
@@ -117,6 +119,16 @@ public class Game1 : Game
             if (GetItemUnderMouse(mstate) is ProgramItem program)
                 RunProgram(program.ProgramPath);
         }
+
+        if (kstate.IsKeyDown(Keys.LeftControl) && mstate.ScrollWheelValue > _lastScrollWheelValue)
+        {
+            _zoomFactor += 0.1F;
+        }
+        if (kstate.IsKeyDown(Keys.LeftControl) && mstate.ScrollWheelValue < _lastScrollWheelValue)
+        {
+            _zoomFactor -= 0.1F;
+        }
+        _lastScrollWheelValue = mstate.ScrollWheelValue;
         _leftClicked = mstate.LeftButton == ButtonState.Pressed;
         _rightClicked = mstate.RightButton == ButtonState.Pressed;
         _gameService.InteractAll();
@@ -142,11 +154,21 @@ public class Game1 : Game
 
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(Color.CornflowerBlue);
-        _spriteBatch.Begin();
+        float translateX = GraphicsDevice.Viewport.Width / 2 - (_gameService._playerOne.Middle.X * _zoomFactor);
+        float translateY = GraphicsDevice.Viewport.Height / 2 - (_gameService._playerOne.Middle.Y * _zoomFactor);
+        translateX = Math.Min(translateX, 0);
+        translateX = Math.Max(translateX, -_gameService.CurrentMap.Width/2);
+        translateY = Math.Min(translateY, 0);
+        translateY = Math.Max(translateY,  -_gameService.CurrentMap.Height/2);
+        Matrix zoomMatrix;
+        zoomMatrix = Matrix.CreateScale(_zoomFactor) * Matrix.CreateTranslation(translateX, translateY, 0);
+        GraphicsDevice.Clear(Color.Black);
+        _spriteBatch.Begin(transformMatrix: zoomMatrix);
         DrawGraphicObjects();
         DrawGameObjects();
         DrawObject(_gameService._playerOne);
+        _spriteBatch.End();
+        _spriteBatch.Begin();
         DrawWindows();
         _spriteBatch.End();
 

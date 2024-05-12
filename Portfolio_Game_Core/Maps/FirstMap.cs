@@ -12,6 +12,8 @@ public class FirstMap:Map
 {
     public FirstMap(int screenWidth, int screenHeight) : base(screenWidth, screenHeight)
     {
+        Width = 800;
+        Height = 480;
         SeedNextMaps();
         GetFloor();
         SeedGraphicObjects();
