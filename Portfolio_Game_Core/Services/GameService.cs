@@ -21,11 +21,16 @@ public class GameService
 
     public GameService(int screenWidth, int screenHeight)
     {
+        CurrentMap = MapService.Maps["house-entry"];
         ScreenSize = new Vector2(screenWidth, screenHeight);
         _windowCreator = new WindowCreator(screenWidth,screenHeight);
         _playerOne = new Player(0, 0);
-        CurrentMap = new FirstMap(screenWidth,screenHeight);
         InventoryWindow = new InventoryWindow(screenWidth/2 + 50, screenHeight/2 - InventoryWindow.InventoryWindowHeight/2);
+        foreach (var map in MapService.Maps.Values)
+        {
+            map.SeedNextMaps();
+        }
+        
     }
 
     public void AddObject(GameObject gameObject)
@@ -176,11 +181,13 @@ public class GameService
         InventoryWindow.Inventory.Add(item);
     }
 
-    public void ChangeMapIfNecessary()
+    public void ChangeMapIfNecessary(PlayerState playerState)
     {
+        int precisionX = playerState is PlayerState.Up or PlayerState.Down ? 25 : 5; 
+        int precisionY = playerState is PlayerState.Left or PlayerState.Right ? 25 : 5; 
         foreach (var exit in CurrentMap.MapExits.Keys)
         {
-            if (Math.Abs(_playerOne.Middle.X - exit.X) < 25 && Math.Abs(_playerOne.Middle.Y - exit.Y) < 25)
+            if (Math.Abs(_playerOne.Middle.X - exit.X) < precisionX && Math.Abs(_playerOne.Middle.Y - exit.Y) < precisionY)
             {
                 var lastMap = CurrentMap;
                 CurrentMap = CurrentMap.MapExits[exit].Item1??CurrentMap;

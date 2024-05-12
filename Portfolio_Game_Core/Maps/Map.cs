@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Portfolio_Game_Core.Entities;
 using Portfolio_Game_Core.Entities.Graphical;
 using Portfolio_Game_Core.Interfaces;
@@ -20,6 +21,7 @@ public abstract class Map
     protected Vector2 ScreenSize { get; set; }
     public Floor Floor { get; set; }
     public Vector2 EntryLocation { get; set; }
+    public Texture2D Texture { get; set; }
 
     public Map(float screenWidth, float screenHeight, Direction entryDirection = Direction.Neutral)
     {
@@ -32,4 +34,11 @@ public abstract class Map
     }
 
     public abstract void GetEntryLocation(Direction entryDirection);
+
+    public abstract void SeedNextMaps();
+    protected abstract void GetFloor();
+    protected abstract void SeedGraphicObjects();
+    protected abstract void SeedObjects();
+    protected abstract void SeedStartText();
+    protected abstract void SeedWalls();
 }

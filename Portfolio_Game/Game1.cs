@@ -12,6 +12,7 @@ using Portfolio_Game_Core.Entities.Graphical;
 using Portfolio_Game_Core.Entities.Items;
 using Portfolio_Game_Core.Font;
 using Portfolio_Game_Core.Interfaces;
+using Portfolio_Game_Core.Maps;
 using Portfolio_Game_Core.Services;
 
 namespace Portfolio_Game;
@@ -31,6 +32,7 @@ public class Game1 : Game
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
+        MapService.SeedMaps(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
         _gameService = new GameService(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
@@ -61,7 +63,10 @@ public class Game1 : Game
 
         Player.Texture = Content.Load<Texture2D>("character");
         // FloorTile.Texture = Content.Load<Texture2D>("inner");
-        Floor.Texture = Content.Load<Texture2D>("houseentry");
+        
+        MapService.Maps["house-entry"].Texture = Content.Load<Texture2D>("houseentry");
+        MapService.Maps["bathroom"].Texture = Content.Load<Texture2D>("houseentry");
+        MapService.Maps["garden"].Texture = Content.Load<Texture2D>("overworldtemp");
         Wall.Texture = Content.Load<Texture2D>("inner");
         WindowInWall.Texture = Content.Load<Texture2D>("windowinwallsmall");
         TextWindow.Texture = Content.Load<Texture2D>("window200");
@@ -176,6 +181,7 @@ public class Game1 : Game
         zoomMatrix = Matrix.CreateScale(_zoomFactor) * Matrix.CreateTranslation(translateX, translateY, 0);
         GraphicsDevice.Clear(Color.Black);
         _spriteBatch.Begin(transformMatrix: zoomMatrix);
+        DrawMap(_gameService.CurrentMap);
         DrawGraphicObjects();
         DrawGameObjects();
         DrawObject(_gameService._playerOne);
@@ -197,20 +203,18 @@ public class Game1 : Game
 
     private void DrawGraphicObjects()
     {
-        DrawObject(_gameService.CurrentMap.Floor);
         foreach (var graphicObject in _gameService.CurrentMap.GraphicObjects)
         {
             DrawObject(graphicObject);
         }
     }
 
-    // private void DrawFloors()
-    // {
-    //     foreach (var floor in _gameService.CurrentMap.Floors)
-    //     {
-    //         DrawObject(floor); 
-    //     }
-    // }
+    private void DrawMap(Map map)
+    {
+        _spriteBatch.Draw(map.Texture
+            , new Vector2(0, 0)
+            , Color.White);
+    }
 
     private void DrawWindows()
     {
@@ -335,7 +339,7 @@ public class Game1 : Game
         _gameService._playerOne.PlayerState = newPlayerState;
         if (newPlayerState != PlayerState.Neutral)
         {
-            _gameService.ChangeMapIfNecessary();
+            _gameService.ChangeMapIfNecessary(newPlayerState);
         }
     }
 
