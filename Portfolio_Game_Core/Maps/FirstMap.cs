@@ -90,7 +90,7 @@ public class FirstMap:Map
         switch (entryDirection)
         {
             case Direction.Up:
-                EntryLocation = new Vector2((int)(ScreenSize.X / 2 - (float)Player.PlayerWidth/2), ScreenSize.Y - 25);
+                EntryLocation = new Vector2((int)(ScreenSize.X / 2 - (float)Player.PlayerWidth/2), ScreenSize.Y - 40);
                 break;
             case Direction.Down:
                 EntryLocation = new Vector2((int)(ScreenSize.X / 2 - (float)Player.PlayerWidth/2), 10);

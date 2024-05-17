@@ -4,6 +4,7 @@ using Portfolio_Game_Core.Entities;
 using Portfolio_Game_Core.Entities.Graphical;
 using Portfolio_Game_Core.Entities.Items;
 using Portfolio_Game_Core.Helpers;
+using Portfolio_Game_Core.Interfaces;
 using Portfolio_Game_Core.Services;
 
 namespace Portfolio_Game_Core.Maps;
@@ -19,7 +20,9 @@ public class Garden:Map
         SeedObjects();
         SeedStartText();
         SeedWalls();
+        SeedTopGraphics();
     }
+
 
     public override  void SeedNextMaps()
     {
@@ -48,16 +51,33 @@ public class Garden:Map
 
     protected override void SeedWalls()
     {
+        int wallWidth = 15;
+        Vector2 fenceOrigin = new(671, 440);
+        Vector2 fenceSize = new(522,240);
+        int gapMargin = 30;
+        Objects.Add(new InvisibleWall(fenceOrigin.X,fenceOrigin.Y,fenceSize.X,wallWidth));
+        Objects.Add(new InvisibleWall(fenceOrigin.X,fenceOrigin.Y+fenceSize.Y-wallWidth,fenceSize.X/2-gapMargin/2,wallWidth));
+        Objects.Add(new InvisibleWall(fenceOrigin.X + fenceSize.X/2+gapMargin,fenceOrigin.Y+fenceSize.Y-wallWidth,fenceSize.X/2-gapMargin/2,wallWidth));
+        Objects.Add(new InvisibleWall(fenceOrigin.X,fenceOrigin.Y,wallWidth,fenceSize.Y));
+        Objects.Add(new InvisibleWall(fenceOrigin.X+fenceSize.X - wallWidth,fenceOrigin.Y,wallWidth,fenceSize.Y));
+        Vector2 houseOrigin = new(740, 694);
+        Vector2 houseSize = new(380,235);
+        Objects.AddRange(MapHelper.GetSurroundingInvisibleWalls(houseOrigin,houseSize,20));
+    }
+    
+    private void SeedTopGraphics()
+    {
+        GraphicTopObjects.Add( new TopGraphic(723,681,419,163,"houseroof"));
     }
     public override void GetEntryLocation(Direction entryDirection)
     {
         switch (entryDirection)
         {
             case Direction.Down:
-                EntryLocation = new Vector2(900,940);
+                EntryLocation = new Vector2(920,930);
                 break;
             case Direction.Up:
-                EntryLocation = new Vector2(900 , 620);
+                EntryLocation = new Vector2(920 , 600);
                 break;
         } 
     }

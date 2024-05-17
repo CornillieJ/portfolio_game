@@ -73,8 +73,11 @@ public class Game1 : Game
         InventoryWindow.Texture = Content.Load<Texture2D>("inventorywindow");
         Tankie.Texture = Content.Load<Texture2D>("tank");
         Text.Texture = Content.Load<Texture2D>("font2");
+        foreach (TopGraphic graphicTopObject in _gameService.CurrentMap.GraphicTopObjects)
+        {
+           graphicTopObject.Texture = Content.Load<Texture2D>(graphicTopObject.GraphicText);
+        }
     }
-
     protected override void Update(GameTime gameTime)
     {
         var kstate = Keyboard.GetState();
@@ -185,6 +188,7 @@ public class Game1 : Game
         DrawGraphicObjects();
         DrawGameObjects();
         DrawObject(_gameService._playerOne);
+        DrawTopGraphicObjects();
         _spriteBatch.End();
         _spriteBatch.Begin();
         DrawWindows();
@@ -208,7 +212,13 @@ public class Game1 : Game
             DrawObject(graphicObject);
         }
     }
-
+    private void DrawTopGraphicObjects()
+    {
+        foreach (var graphicTopObject in _gameService.CurrentMap.GraphicTopObjects)
+        {
+            DrawObject(graphicTopObject);
+        }
+    }
     private void DrawMap(Map map)
     {
         _spriteBatch.Draw(map.Texture
@@ -259,7 +269,13 @@ public class Game1 : Game
             DrawObject(gameObject);
         }
     }
-
+    private void DrawObject(TopGraphic topGraphic)
+    {
+        _spriteBatch.Draw(topGraphic.Texture
+            , new Vector2(topGraphic.PositionX, topGraphic.PositionY)
+            , topGraphic.CurrentSprite
+            , Color.White);
+    }
     private void DrawObject(GameObject gameObject)
     {
         if (gameObject is not IVisible visible) return;
@@ -339,7 +355,8 @@ public class Game1 : Game
         _gameService._playerOne.PlayerState = newPlayerState;
         if (newPlayerState != PlayerState.Neutral)
         {
-            _gameService.ChangeMapIfNecessary(newPlayerState);
+            bool isNewMap = _gameService.ChangeMapIfNecessary(newPlayerState);
+            if(isNewMap) LoadContent();
         }
     }
 

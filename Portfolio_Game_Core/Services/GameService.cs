@@ -181,7 +181,7 @@ public class GameService
         InventoryWindow.Inventory.Add(item);
     }
 
-    public void ChangeMapIfNecessary(PlayerState playerState)
+    public bool ChangeMapIfNecessary(PlayerState playerState)
     {
         int precisionX = playerState is PlayerState.Up or PlayerState.Down ? 25 : 5; 
         int precisionY = playerState is PlayerState.Left or PlayerState.Right ? 25 : 5; 
@@ -194,8 +194,10 @@ public class GameService
                 CurrentMap.GetEntryLocation(lastMap.MapExits[exit].Item2);
                 _playerOne.PositionX = CurrentMap.EntryLocation.X;
                 _playerOne.PositionY = CurrentMap.EntryLocation.Y;
+                return true;
             }
-            
         }
+
+        return false;
     }
 }
