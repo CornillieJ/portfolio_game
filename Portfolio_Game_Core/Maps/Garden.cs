@@ -60,7 +60,7 @@ public class Garden:Map
         Objects.Add(new InvisibleWall(fenceOrigin.X + fenceSize.X/2+gapMargin,fenceOrigin.Y+fenceSize.Y-wallWidth,fenceSize.X/2-gapMargin/2,wallWidth));
         Objects.Add(new InvisibleWall(fenceOrigin.X,fenceOrigin.Y,wallWidth,fenceSize.Y));
         Objects.Add(new InvisibleWall(fenceOrigin.X+fenceSize.X - wallWidth,fenceOrigin.Y,wallWidth,fenceSize.Y));
-        Vector2 houseOrigin = new(740, 694);
+        Vector2 houseOrigin = new(740, 690);
         Vector2 houseSize = new(380,235);
         Objects.AddRange(MapHelper.GetSurroundingInvisibleWalls(houseOrigin,houseSize,20));
     }
