@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Portfolio_Game_Core.Data;
 using Portfolio_Game_Core.Entities.Base;
 using Portfolio_Game_Core.Interfaces;
 using Portfolio_Game_Core.Services;
@@ -44,7 +45,7 @@ public class Chest:GameObject, IInteractable, IVisible
         if (_isOpen) return (null,null, null);
         _isOpen = true;
         CurrentSprite = new Rectangle(34, 0, Width, Height);
-        return ("chest", "You took a program out of the chest, have a look in your inventory to run it.",_inventory[0]);
+        return ("chest",TextData.ChestTexts[0],_inventory[0]);
     }
 
     public void ShowInventory()
