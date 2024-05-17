@@ -14,7 +14,7 @@ public class TextWindow:Window, IVisible
     public static Texture2D Texture { get; set; }
     private List<Text>? _content;
     public IEnumerable<Text> Content => _content.AsReadOnly();
-
+    public List<Text> Next { get; set; }
     public TextWindow(float x, float y, string title, string content) : base(x, y, title)
     {
         TextMarginX = 48;
@@ -25,6 +25,7 @@ public class TextWindow:Window, IVisible
         PositionY = y;
         CurrentSprite = new Rectangle(0, 0, Width, Height);
         _content = GetText(TextWindowWidth,TextWindowHeight,content);
+        Next = GetNextText("SPACE >>");
     }
     
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.Xna.Framework;
 using Portfolio_Game_Core.Font;
 using Portfolio_Game_Core.Interfaces;
 
@@ -38,6 +39,22 @@ public class Window:GameObject
                 result.Add(new Number(textX, PositionY+5, c));
             else
                 result.Add(new Letter(textX, PositionY+5, c));
+            textX += Text.TextWidth;
+        }
+
+        return result;
+    }
+    public List<Text> GetNextText(string nextText)
+    {
+        List<Text> result = new();
+        float textX = Right - (nextText.Length * Text.TextWidth);;
+        float textY = Bottom - TextMarginY;
+        foreach (char c in nextText)
+        {
+            if (int.TryParse(c.ToString(), out int value))
+                result.Add(new Number(textX, textY, c));
+            else
+                result.Add(new Letter(textX, textY, c));
             textX += Text.TextWidth;
         }
 

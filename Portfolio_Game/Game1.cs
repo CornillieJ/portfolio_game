@@ -19,6 +19,7 @@ namespace Portfolio_Game;
 
 public class Game1 : Game
 {
+    private const int FlickerTime = 80;
     float _zoomFactor = 1.0f;
     private float _lastScrollWheelValue = 0;
     private GameService _gameService;
@@ -28,6 +29,7 @@ public class Game1 : Game
     private bool _isInventoryPressed = false;
     private bool _leftClicked = false;
     private bool _rightClicked = false;
+    private int _flickerCounter = 0;
 
     public Game1()
     {
@@ -236,6 +238,11 @@ public class Game1 : Game
             {
                 DrawObjects(textWindow.Title);
                 DrawObjects(textWindow.Content);
+                if (_flickerCounter >= FlickerTime)
+                    DrawObjects(textWindow.Next);
+                if (_flickerCounter >= FlickerTime * 2)
+                    _flickerCounter = 0;
+                _flickerCounter++;
             }
         }
 

@@ -32,7 +32,6 @@ public class Garden:Map
 
     protected override void SeedObjects()
     {
-        Objects.Add(new Chest(50,50, new Tankie(0)));
     }
 
     protected override void GetFloor()
