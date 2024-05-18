@@ -62,6 +62,8 @@ public class Garden:Map
         Vector2 houseOrigin = new(740, 690);
         Vector2 houseSize = new(380,235);
         Objects.AddRange(MapHelper.GetSurroundingInvisibleWalls(houseOrigin,houseSize,20));
+        //TODO: Remove this invisible wall and expand garden
+        Objects.AddRange(MapHelper.GetSurroundingInvisibleWalls(new (508,480),new(864,639),20));
     }
     
     private void SeedTopGraphics()
