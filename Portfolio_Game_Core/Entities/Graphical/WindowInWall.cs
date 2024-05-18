@@ -19,12 +19,12 @@ public class WindowInWall:GameObject, IVisible
         PositionY = y;
         CurrentSprite = new Rectangle(0, 0, WindowWidth, WindowHeight);
     }
-    public Texture2D GetStaticTexture()
+    public Texture2D GetTexture()
     {
         return Texture;
     }
 
-    public void SetStaticTexture(Texture2D texture)
+    public void SetTexture(Texture2D texture)
     {
         Texture = texture;
     }

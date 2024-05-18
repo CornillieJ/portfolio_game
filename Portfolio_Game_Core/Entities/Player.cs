@@ -36,12 +36,12 @@ public class Player : GameObject, IMovable, IVisible
         Texture = texture;
     }
 
-    public Texture2D GetStaticTexture()
+    public Texture2D GetTexture()
     {
         return Texture;
     }
 
-    public void SetStaticTexture(Texture2D texture)
+    public void SetTexture(Texture2D texture)
     {
         Texture = texture;
     }
@@ -145,6 +145,27 @@ public class Player : GameObject, IMovable, IVisible
                 return new Vector2(Left - distance, PositionY + Height / 2);
             default:
                 return new Vector2(0, 0);
+        }
+    }
+
+    public void TurnPlayer()
+    {
+        switch (PlayerState)
+        {
+            default:
+            case PlayerState.Neutral:
+            case PlayerState.Down:
+                CurrentSprite = SpriteData.DownSprites[0];
+                break;
+            case PlayerState.Up:
+                CurrentSprite = SpriteData.UpSprites[0];
+                break;
+            case PlayerState.Right:
+                CurrentSprite = SpriteData.RightSprites[0];
+                break;
+            case PlayerState.Left:
+                CurrentSprite = SpriteData.LeftSprites[0];
+                break;
         }
     }
 }

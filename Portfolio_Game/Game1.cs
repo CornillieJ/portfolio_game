@@ -19,6 +19,7 @@ namespace Portfolio_Game;
 
 public class Game1 : Game
 {
+    private const int FlickerTime = 80;
     float _zoomFactor = 1.0f;
     private float _lastScrollWheelValue = 0;
     private GameService _gameService;
@@ -28,6 +29,9 @@ public class Game1 : Game
     private bool _isInventoryPressed = false;
     private bool _leftClicked = false;
     private bool _rightClicked = false;
+    private int _flickerCounter = 0;
+    private int _interactCounter = 0;
+    private Vector2 _initialPlayerPosition = new(0, 0);
 
     public Game1()
     {
@@ -52,18 +56,25 @@ public class Game1 : Game
         foreach (var gameServiceObject in _gameService.CurrentMap.Objects)
         {
             if (gameServiceObject is not IVisible iVisible) continue;
-            iVisible.SetStaticTexture(Content.Load<Texture2D>("objects"));
+            if (gameServiceObject is Generic generic)
+            {
+                generic.Texture = Content.Load<Texture2D>(generic.GraphicText);
+            }
+            else
+            {
+                iVisible.SetTexture(Content.Load<Texture2D>("objects"));
+            }
         }
-
         foreach (var graphicObject in _gameService.CurrentMap.GraphicObjects)
         {
             if (graphicObject is not IVisible iVisible) continue;
-            iVisible.SetStaticTexture(Content.Load<Texture2D>("inner"));
+            iVisible.SetTexture(Content.Load<Texture2D>("inner"));
         }
-
+        foreach (TopGraphic graphicTopObject in _gameService.CurrentMap.GraphicTopObjects)
+        {
+            graphicTopObject.Texture = Content.Load<Texture2D>(graphicTopObject.GraphicText);
+        }
         Player.Texture = Content.Load<Texture2D>("character");
-        // FloorTile.Texture = Content.Load<Texture2D>("inner");
-        
         MapService.Maps["house-entry"].Texture = Content.Load<Texture2D>("houseentry");
         MapService.Maps["bathroom"].Texture = Content.Load<Texture2D>("houseentry");
         MapService.Maps["garden"].Texture = Content.Load<Texture2D>("overworldtemp");
@@ -72,9 +83,10 @@ public class Game1 : Game
         TextWindow.Texture = Content.Load<Texture2D>("window200");
         InventoryWindow.Texture = Content.Load<Texture2D>("inventorywindow");
         Tankie.Texture = Content.Load<Texture2D>("tank");
+        OuterWilds.Texture = Content.Load<Texture2D>("outerwilds");
         Text.Texture = Content.Load<Texture2D>("font2");
+ 
     }
-
     protected override void Update(GameTime gameTime)
     {
         var kstate = Keyboard.GetState();
@@ -101,6 +113,12 @@ public class Game1 : Game
         }
 
         //Only check input up to here if there are open text windows (no walking allowed if open)
+        if (_gameService.CurrentMap.Interactables.Any())
+        {
+            _gameService.InteractAll(ref _interactCounter, ref _initialPlayerPosition);
+            return;
+        }
+        _interactCounter = 0;
         MovePlayerOnInput(gameTime, kstate);
         if ((kstate.IsKeyDown(Keys.Space) || kstate.IsKeyDown(Keys.Enter)) && _isActionPressed == false)
         {
@@ -129,8 +147,11 @@ public class Game1 : Game
 
         if (mstate.RightButton == ButtonState.Pressed && _rightClicked == false)
         {
-            if (GetItemUnderMouse(mstate) is ProgramItem program)
+            var item = GetItemUnderMouse(mstate); 
+            if ( item is ProgramItem program)
                 RunProgram(program.ProgramPath);
+            if (item is Website website)
+                OpenWebsite(website.ProgramPath);
         }
 
         if (kstate.IsKeyDown(Keys.LeftControl) && mstate.ScrollWheelValue > _lastScrollWheelValue)
@@ -146,7 +167,6 @@ public class Game1 : Game
         _lastScrollWheelValue = mstate.ScrollWheelValue;
         _leftClicked = mstate.LeftButton == ButtonState.Pressed;
         _rightClicked = mstate.RightButton == ButtonState.Pressed;
-        _gameService.InteractAll();
         _gameService.MoveInventoryOnPlayerPosition();
         base.Update(gameTime);
     }
@@ -185,6 +205,7 @@ public class Game1 : Game
         DrawGraphicObjects();
         DrawGameObjects();
         DrawObject(_gameService._playerOne);
+        DrawTopGraphicObjects();
         _spriteBatch.End();
         _spriteBatch.Begin();
         DrawWindows();
@@ -208,7 +229,13 @@ public class Game1 : Game
             DrawObject(graphicObject);
         }
     }
-
+    private void DrawTopGraphicObjects()
+    {
+        foreach (var graphicTopObject in _gameService.CurrentMap.GraphicTopObjects)
+        {
+            DrawObject(graphicTopObject);
+        }
+    }
     private void DrawMap(Map map)
     {
         _spriteBatch.Draw(map.Texture
@@ -226,6 +253,11 @@ public class Game1 : Game
             {
                 DrawObjects(textWindow.Title);
                 DrawObjects(textWindow.Content);
+                if (_flickerCounter >= FlickerTime)
+                    DrawObjects(textWindow.Next);
+                if (_flickerCounter >= FlickerTime * 2)
+                    _flickerCounter = 0;
+                _flickerCounter++;
             }
         }
 
@@ -259,11 +291,18 @@ public class Game1 : Game
             DrawObject(gameObject);
         }
     }
-
+    private void DrawObject(TopGraphic topGraphic)
+    {
+        topGraphic.Texture ??= Content.Load<Texture2D>(topGraphic.GraphicText);
+        _spriteBatch.Draw(topGraphic.Texture
+            , new Vector2(topGraphic.PositionX, topGraphic.PositionY)
+            , topGraphic.CurrentSprite
+            , Color.White);
+    }
     private void DrawObject(GameObject gameObject)
     {
         if (gameObject is not IVisible visible) return;
-        _spriteBatch.Draw(visible.GetStaticTexture()
+        _spriteBatch.Draw(visible.GetTexture()
             , new Vector2(gameObject.PositionX, gameObject.PositionY)
             , gameObject.CurrentSprite
             , Color.White);
@@ -273,7 +312,7 @@ public class Game1 : Game
     {
         if (gameObject is not IVisible visible) return;
         _spriteBatch.Draw(
-            visible.GetStaticTexture(),
+            visible.GetTexture(),
             new Vector2(gameObject.PositionX, gameObject.PositionY),
             null,
             Color.White,
@@ -288,7 +327,7 @@ public class Game1 : Game
     private void DrawObject(GameItem gameItem)
     {
         if (gameItem is not IVisible visible) return;
-        _spriteBatch.Draw(visible.GetStaticTexture()
+        _spriteBatch.Draw(visible.GetTexture()
             , new Vector2(gameItem.PositionX, gameItem.PositionY)
             , gameItem.CurrentSprite
             , Color.White);
@@ -339,7 +378,8 @@ public class Game1 : Game
         _gameService._playerOne.PlayerState = newPlayerState;
         if (newPlayerState != PlayerState.Neutral)
         {
-            _gameService.ChangeMapIfNecessary(newPlayerState);
+            bool isNewMap = _gameService.ChangeMapIfNecessary(newPlayerState);
+            if(isNewMap) LoadContent();
         }
     }
 
@@ -348,6 +388,17 @@ public class Game1 : Game
         try
         {
             Process.Start(programPath);
+        }
+        catch (Exception ex)
+        {
+            _gameService.AddTextWindow("Error", string.Concat("Could not start program: ", ex.Message.AsSpan(0, 20)));
+        }
+    }
+    private void OpenWebsite(string programPath)
+    {
+        try
+        {
+            Process.Start(@"cmd.exe ", @"/c " + programPath);
         }
         catch (Exception ex)
         {

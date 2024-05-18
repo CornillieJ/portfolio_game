@@ -26,12 +26,14 @@ public class FirstMap:Map
     {
         MapExits.Add(new Vector2(ScreenSize.X/2,5),( MapService.Maps["garden"],Direction.Up));
         MapExits.Add(new Vector2(ScreenSize.X/2,ScreenSize.Y-5),( MapService.Maps["garden"],Direction.Down));
-        MapExits.Add(new Vector2(ScreenSize.X,ScreenSize.Y/2),(MapService.Maps["bathroom"],Direction.Right));
+        MapExits.Add(new Vector2(ScreenSize.X-5,ScreenSize.Y/2),(MapService.Maps["bathroom"],Direction.Right));
     }
 
     protected override void SeedObjects()
     {
-        Objects.Add(new Chest(50,50, new Tankie(0)));
+        var chestTankie = new Chest(50, 50, new Tankie(0));
+        chestTankie.ResultTexts.Add(("chest", TextData.ChestTexts[0]));
+        Objects.Add(chestTankie);
     }
 
     protected override void GetFloor()
@@ -90,16 +92,16 @@ public class FirstMap:Map
         switch (entryDirection)
         {
             case Direction.Up:
-                EntryLocation = new Vector2((int)(ScreenSize.X / 2 - (float)Player.PlayerWidth/2), ScreenSize.Y - 50);
+                EntryLocation = new Vector2((int)(ScreenSize.X / 2 - (float)Player.PlayerWidth/2), ScreenSize.Y - 40);
                 break;
             case Direction.Down:
                 EntryLocation = new Vector2((int)(ScreenSize.X / 2 - (float)Player.PlayerWidth/2), 10);
                 break;
             case Direction.Left:
-                EntryLocation = new Vector2(ScreenSize.X - 25, (int)(ScreenSize.Y / 2 - (float)Player.PlayerHeight/2));
+                EntryLocation = new Vector2(ScreenSize.X - 35, (int)(ScreenSize.Y / 2 - 10 - (float)Player.PlayerHeight/2));
                 break;
             case Direction.Neutral:
-                EntryLocation = new Vector2((int)(ScreenSize.X / 2 - (float)Player.PlayerWidth/2), (int)(ScreenSize.Y / 2 - (float)Player.PlayerHeight/2));
+                EntryLocation = new Vector2((int)(ScreenSize.X / 2 - 10 - (float)Player.PlayerWidth/2), (int)(ScreenSize.Y / 2 - (float)Player.PlayerHeight/2));
                 break;
         } 
     }

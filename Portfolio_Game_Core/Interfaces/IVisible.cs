@@ -4,6 +4,6 @@ namespace Portfolio_Game_Core.Interfaces;
 
 public interface IVisible
 {
-    public Texture2D GetStaticTexture();
-    public void SetStaticTexture(Texture2D texture);
+    public Texture2D GetTexture();
+    public void SetTexture(Texture2D texture);
 }
