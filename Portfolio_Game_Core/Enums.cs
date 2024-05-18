@@ -9,3 +9,8 @@ public enum Direction
 {
    Up,Down,Left,Right,UpLeft,UpRight,DownLeft,DownRight,Neutral
 }
+
+public enum ResultAction
+{
+   Nothing,ShowText,AddToInventory,MovePlayer,ResetPlayer,Delay,SwitchObjectState,AddObject,RemoveObject,NoMoreInteraction
+}

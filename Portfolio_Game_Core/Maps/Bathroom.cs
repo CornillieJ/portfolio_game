@@ -1,9 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Portfolio_Game_Core.Data;
 using Portfolio_Game_Core.Entities;
+using Portfolio_Game_Core.Entities.Base;
 using Portfolio_Game_Core.Entities.Graphical;
 using Portfolio_Game_Core.Entities.Items;
 using Portfolio_Game_Core.Helpers;
+using Portfolio_Game_Core.Interfaces;
 using Portfolio_Game_Core.Services;
 
 namespace Portfolio_Game_Core.Maps;
@@ -30,6 +32,38 @@ public class Bathroom:Map
 
     protected override void SeedObjects()
     {
+        var bath = new Generic(30, 65, 97, 67, "bath",TextData.ObjectEndTexts["Bath"], () =>
+        {
+            return new[]
+            {
+                ResultAction.ShowText,
+                ResultAction.MovePlayer,
+                ResultAction.AddObject,
+                ResultAction.Delay,
+                ResultAction.ShowText,
+                ResultAction.Delay,
+                ResultAction.ShowText,
+                ResultAction.Delay,
+                ResultAction.ShowText,
+                ResultAction.Delay,
+                ResultAction.RemoveObject,
+                ResultAction.ResetPlayer,
+                ResultAction.ShowText,
+                ResultAction.ShowText,
+                ResultAction.AddToInventory,
+                ResultAction.SwitchObjectState,
+            };
+        });
+        foreach (string text in TextData.ObjectsTexts["Bath"])
+        {
+            bath.ResultTexts.Add(("Bath", text));
+        }
+        bath.ResultMovePositions.Add((new Vector2(75,60),PlayerState.Left));
+        bath.ResultDelays.AddRange(new[] { 100, 100, 100, 100 });
+        bath.ObjectAdditions.Add(new TopGraphic(30,65,97,67,"bathpiece"));
+        bath.Inventory.Add(new OuterWilds(0));
+        Objects.Add(bath);
+        
     }
     protected override void SeedGraphicObjects()
     {
@@ -52,4 +86,5 @@ public class Bathroom:Map
     {
         EntryLocation = new Vector2(15, (int)(ScreenSize.Y / 2 - (float)Player.PlayerHeight/2));
     }
+
 }

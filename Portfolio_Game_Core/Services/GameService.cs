@@ -14,6 +14,8 @@ public class GameService
 {
     private int _topMargin = 35;
     private WindowCreator _windowCreator;
+    private int _delayCounter;
+    private int _delayTime;
     public Player _playerOne { get; set; }
     public Vector2 ScreenSize { get; }
     public Map CurrentMap { get; set; }
@@ -94,8 +96,6 @@ public class GameService
 
         return true;
     }
-
-    
     public void ShiftWindow()
     {
         CurrentMap.Windows.RemoveAt(0);
@@ -105,7 +105,6 @@ public class GameService
         if (!CurrentMap.Windows.Contains(window)) return;
         CurrentMap.Windows.Remove(window);
     }
-
     public void AddWindow(Window window)
     {
         CurrentMap.Windows.Add(window);
@@ -124,13 +123,11 @@ public class GameService
 
         return null;
     }
-
     public GameObject? GetObjectPlayerIsLookingAt()
     {
         Vector2 location = _playerOne.GetVisionCoordinate();
         return GetObjectAtLocation(location);
     }
-
     public void AddInteraction(IInteractable interactable)
     {
         CurrentMap.Interactables.Add(interactable);
@@ -140,21 +137,85 @@ public class GameService
         if(CurrentMap.Interactables.Contains(interactable))
             CurrentMap.Interactables.Remove(interactable);
     }
-    public void InteractAll()
+    public void InteractAll(ref int interactCounter, ref Vector2 initialPlayerPosition)
     {
-        while(CurrentMap.Interactables.Any())
+        if (_delayCounter < _delayTime)
         {
-            (string? title, string? content, GameItem? item) = CurrentMap.Interactables[0].Interact();
-            if(title is not null && content is not null )
-                CurrentMap.Windows.Add( _windowCreator.GetTextWindow(title,content));
-            if (item is not null)
-            {
-                AddToInventory(item);
-            }
+            _delayCounter++;
+            return;
+        }
+        _delayTime = 0;
+        _delayCounter = 0;
+        var resultActions = CurrentMap.Interactables[0].Interact();
+        var resultAction = resultActions[interactCounter];
+        switch (resultAction)
+        {
+            case ResultAction.ShowText:
+                string title = CurrentMap.Interactables[0].ResultTexts[0].Item1;
+                string content = CurrentMap.Interactables[0].ResultTexts[0].Item2;
+                CurrentMap.Interactables[0].ResultTexts.RemoveAt(0);
+                CurrentMap.Windows.Add(_windowCreator.GetTextWindow(title, content));
+                break;
+            case ResultAction.AddToInventory:
+                var hasInventory = (IHasInventory)CurrentMap.Interactables[0];
+                AddToInventory(hasInventory.Inventory);
+                break;
+            case ResultAction.MovePlayer:
+                initialPlayerPosition = new Vector2(_playerOne.PositionX, _playerOne.PositionY);
+                _playerOne.PositionX = CurrentMap.Interactables[0].ResultMovePositions[0].Item1.X;
+                _playerOne.PositionY = CurrentMap.Interactables[0].ResultMovePositions[0].Item1.Y;
+                _playerOne.PlayerState = CurrentMap.Interactables[0].ResultMovePositions[0].Item2;
+                _playerOne.TurnPlayer();
+                CurrentMap.Interactables[0].ResultMovePositions.RemoveAt(0);
+                break;
+            case ResultAction.ResetPlayer:
+                _playerOne.PositionX = initialPlayerPosition.X;
+                _playerOne.PositionY = initialPlayerPosition.Y;
+                break;
+            case ResultAction.Delay:
+                _delayTime = CurrentMap.Interactables[0].ResultDelays[0];
+                CurrentMap.Interactables[0].ResultDelays.RemoveAt(0);
+                break;
+            case ResultAction.SwitchObjectState:
+                CurrentMap.Interactables[0].SwitchState();
+                break;
+            case ResultAction.NoMoreInteraction:
+                string endTitle = CurrentMap.Interactables[0].NoInteractionText.Item1;
+                string endContent = CurrentMap.Interactables[0].NoInteractionText.Item2;
+                CurrentMap.Windows.Add(_windowCreator.GetTextWindow(endTitle, endContent)); 
+                break;
+            case ResultAction.AddObject:
+                foreach (var gameObject in CurrentMap.Interactables[0].ObjectAdditions)
+                {
+                    if(gameObject is TopGraphic topGraphic)
+                        CurrentMap.GraphicTopObjects.Add(topGraphic);
+                    else
+                        CurrentMap.Objects.Add(gameObject);
+                }
+                break;
+            case ResultAction.RemoveObject:
+                foreach (var gameObject in CurrentMap.Interactables[0].ObjectAdditions)
+                {
+                    if(gameObject is TopGraphic topGraphic)
+                        CurrentMap.GraphicTopObjects.Remove(topGraphic);
+                    else
+                        CurrentMap.Objects.Remove(gameObject);
+                }
+                break;
+            case ResultAction.Nothing:
+            default:
+                break; 
+        }
+        if (interactCounter + 1 >= resultActions.Length && CurrentMap.Interactables.Any())
+        {
             CurrentMap.Interactables.RemoveAt(0);
+            interactCounter = 0;
+        }
+        else
+        {
+            interactCounter++;
         }
     }
-
     public void MoveInventoryOnPlayerPosition()
     {
         int difference = 0;
@@ -175,12 +236,18 @@ public class GameService
     }
     public void AddToInventory(GameItem item)
     {
-        item.InventoryNumber = InventoryWindow.Inventory.Count;
+        item.UpdatePosition(InventoryWindow.Inventory.Count);
         item.PositionX = item.ItemPositionX + InventoryWindow.PositionX;
         item.PositionY = item.ItemPositionY + InventoryWindow.PositionY;
         InventoryWindow.Inventory.Add(item);
     }
-
+    public void AddToInventory(IEnumerable<GameItem> items)
+    {
+        foreach (var gameItem in items)
+        {
+            AddToInventory(gameItem);
+        }
+    }
     public bool ChangeMapIfNecessary(PlayerState playerState)
     {
         int precisionX = playerState is PlayerState.Up or PlayerState.Down ? 25 : 5; 

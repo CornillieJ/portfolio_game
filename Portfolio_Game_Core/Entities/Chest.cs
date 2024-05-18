@@ -7,17 +7,19 @@ using Portfolio_Game_Core.Services;
 
 namespace Portfolio_Game_Core.Entities;
 
-public class Chest:GameObject, IInteractable, IVisible
+public class Chest:GameObject, IInteractable, IVisible, IHasInventory
 {
     private static Texture2D Texture { get; set; }
     private static int ChestWidth => 28;
     private static int ChestHeight => 27;
-    private List<GameItem> _inventory;
     private bool _isOpen = false;
-    public IEnumerable<GameItem> Inventory
-    {
-        get => _inventory.AsReadOnly();
-    }
+    public List<GameItem> Inventory { get; set; }
+    public List<(string, string)> ResultTexts { get; set; }
+    public List<(Vector2, PlayerState)> ResultMovePositions { get; set; }
+    public List<int> ResultDelays { get; set; }
+    public (string, string) NoInteractionText { get; set; }
+    public List<GameObject> ObjectAdditions { get; set; }
+
     public Chest(int x, int y)
     {
         Width = ChestWidth;
@@ -25,31 +27,44 @@ public class Chest:GameObject, IInteractable, IVisible
         PositionX = x;
         PositionY = y;
         CurrentSprite = new Rectangle(0, 0, Width, Height);
-        _inventory = new List<GameItem>();
+        Inventory = new List<GameItem>();
+        ResultTexts = new List<(string, string)>();
+        ResultMovePositions = new List<(Vector2, PlayerState)>();
+        ResultDelays = new List<int>();
+        ObjectAdditions = new List<GameObject>();
     }
 
     public Chest(int x, int y, GameItem item) : this(x, y)
     {
-        _inventory.Add(item);
+        Inventory.Add(item);
     }
-    public Texture2D GetStaticTexture()
+    public Texture2D GetTexture()
     {
         return Texture;
     }
-    public void SetStaticTexture(Texture2D texture)
+    public void SetTexture(Texture2D texture)
     {
         Texture = texture;
     }
-    public (string,string, GameItem) Interact()
+    public ResultAction[] Interact()
     {
-        if (_isOpen) return (null,null, null);
-        _isOpen = true;
-        CurrentSprite = new Rectangle(34, 0, Width, Height);
-        return ("chest",TextData.ChestTexts[0],_inventory[0]);
+        if (_isOpen) return new []{ResultAction.Nothing};
+        return new []
+        {
+            ResultAction.ShowText,
+            ResultAction.AddToInventory,
+            ResultAction.SwitchObjectState
+        };
     }
-
+    
     public void ShowInventory()
     {
        //TODO 
+    }
+    
+    public void SwitchState()
+    {
+        _isOpen = true;
+        CurrentSprite = new Rectangle(34, 0, Width, Height);
     }
 }

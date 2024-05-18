@@ -31,7 +31,9 @@ public class FirstMap:Map
 
     protected override void SeedObjects()
     {
-        Objects.Add(new Chest(50,50, new Tankie(0)));
+        var chestTankie = new Chest(50, 50, new Tankie(0));
+        chestTankie.ResultTexts.Add(("chest", TextData.ChestTexts[0]));
+        Objects.Add(chestTankie);
     }
 
     protected override void GetFloor()
