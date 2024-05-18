@@ -26,7 +26,7 @@ public class FirstMap:Map
     {
         MapExits.Add(new Vector2(ScreenSize.X/2,5),( MapService.Maps["garden"],Direction.Up));
         MapExits.Add(new Vector2(ScreenSize.X/2,ScreenSize.Y-5),( MapService.Maps["garden"],Direction.Down));
-        MapExits.Add(new Vector2(ScreenSize.X,ScreenSize.Y/2),(MapService.Maps["bathroom"],Direction.Right));
+        MapExits.Add(new Vector2(ScreenSize.X-5,ScreenSize.Y/2),(MapService.Maps["bathroom"],Direction.Right));
     }
 
     protected override void SeedObjects()
@@ -98,10 +98,10 @@ public class FirstMap:Map
                 EntryLocation = new Vector2((int)(ScreenSize.X / 2 - (float)Player.PlayerWidth/2), 10);
                 break;
             case Direction.Left:
-                EntryLocation = new Vector2(ScreenSize.X - 25, (int)(ScreenSize.Y / 2 - (float)Player.PlayerHeight/2));
+                EntryLocation = new Vector2(ScreenSize.X - 35, (int)(ScreenSize.Y / 2 - 10 - (float)Player.PlayerHeight/2));
                 break;
             case Direction.Neutral:
-                EntryLocation = new Vector2((int)(ScreenSize.X / 2 - (float)Player.PlayerWidth/2), (int)(ScreenSize.Y / 2 - (float)Player.PlayerHeight/2));
+                EntryLocation = new Vector2((int)(ScreenSize.X / 2 - 10 - (float)Player.PlayerWidth/2), (int)(ScreenSize.Y / 2 - (float)Player.PlayerHeight/2));
                 break;
         } 
     }

@@ -84,7 +84,7 @@ public class Bathroom:Map
 
     public override void GetEntryLocation(Direction entryDirection)
     {
-        EntryLocation = new Vector2(15, (int)(ScreenSize.Y / 2 - (float)Player.PlayerHeight/2));
+    EntryLocation = new Vector2(15, (int)(ScreenSize.Y / 2 - 10 - (float)Player.PlayerHeight/2));
     }
 
 }
