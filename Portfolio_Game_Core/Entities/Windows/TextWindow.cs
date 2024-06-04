@@ -9,16 +9,14 @@ namespace Portfolio_Game_Core.Entities;
 
 public class TextWindow:Window, IVisible
 {
-    public static int TextWindowHeight => 200;
-    public static int TextWindowWidth => 720;
+    public static int TextWindowHeight { get; set; } = 200;
+    public static int TextWindowWidth { get; set; } = 720;
     public static Texture2D Texture { get; set; }
     private List<Text>? _content;
     public IEnumerable<Text> Content => _content.AsReadOnly();
     public List<Text> Next { get; set; }
     public TextWindow(float x, float y, string title, string content) : base(x, y, title)
     {
-        TextMarginX = 48;
-        TextMarginY = 48;
         Width = TextWindowWidth;
         Height = TextWindowHeight;
         PositionX = x;
@@ -27,9 +25,6 @@ public class TextWindow:Window, IVisible
         _content = GetText(TextWindowWidth,TextWindowHeight,content);
         Next = GetNextText("SPACE >>");
     }
-    
-
-    
     
     public Texture2D GetTexture()
     {

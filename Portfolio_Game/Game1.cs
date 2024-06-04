@@ -14,45 +14,68 @@ using Portfolio_Game_Core.Font;
 using Portfolio_Game_Core.Interfaces;
 using Portfolio_Game_Core.Maps;
 using Portfolio_Game_Core.Services;
+using Portfolio_Game.Helpers;
 
 namespace Portfolio_Game;
 
 public class Game1 : Game
 {
-    private const int FlickerTime = 80;
     float _zoomFactor = 1.0f;
+    float _resolutionScaleFactor = 1.0f;
+    private Texture2D _debugTexture; 
     private float _lastScrollWheelValue = 0;
     private GameService _gameService;
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
     private bool _isActionPressed = false;
+    private bool _isFullscreenPressed = false;
     private bool _isInventoryPressed = false;
     private bool _leftClicked = false;
     private bool _rightClicked = false;
-    private int _flickerCounter = 0;
     private int _interactCounter = 0;
     private Vector2 _initialPlayerPosition = new(0, 0);
+    private DrawHelper _drawHelper;
 
     public Game1()
     {
-        _graphics = new GraphicsDeviceManager(this);
-        MapService.SeedMaps(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
-        _gameService = new GameService(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
+        _graphics = new GraphicsDeviceManager(this);        
+        // _graphics.IsFullScreen = true;
+        _graphics.PreferredBackBufferWidth = 1920;
+        _graphics.PreferredBackBufferHeight = 1080;
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
     }
-
     protected override void Initialize()
     {
+        _resolutionScaleFactor = GraphicsDevice.Viewport.Width / 800F;
+        //ScaleWindows();
+        _zoomFactor = _resolutionScaleFactor;
+        _zoomFactor = Math.Min(_zoomFactor,2);
+        _zoomFactor = Math.Max(_zoomFactor, 0.9F);
+        MapService.SeedMaps(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
+        _gameService = new GameService(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
         Player player = _gameService._playerOne;
-        player.PositionX = _graphics.PreferredBackBufferWidth / 2 - (player.Width / 2);
-        player.PositionY = _graphics.PreferredBackBufferHeight / 2 - (player.Height / 2);
+        player.PositionX = _gameService.CurrentMap.Width / 2 - (player.Width / 2);
+        player.PositionY = _gameService.CurrentMap.Height / 2 - (player.Height / 2);
         base.Initialize();
     }
-
+    private void ScaleWindows()
+    {
+        WindowCreator.WindowMargin = (int)(WindowCreator.WindowMargin * _resolutionScaleFactor);
+        TextWindow.TextWindowWidth = (int)(TextWindow.TextWindowWidth * _resolutionScaleFactor);
+        Portfolio_Game_Core.Entities.Window.LineMarginY = (int)(Portfolio_Game_Core.Entities.Window.LineMarginY * _resolutionScaleFactor);
+        Portfolio_Game_Core.Entities.Window.TitleMarginX = (int)(Portfolio_Game_Core.Entities.Window.TitleMarginX * _resolutionScaleFactor);
+        Portfolio_Game_Core.Entities.Window.TitleMarginY = (int)(Portfolio_Game_Core.Entities.Window.TitleMarginY * _resolutionScaleFactor);
+        InventoryWindow.InventoryWindowHeight = (int)(InventoryWindow.InventoryWindowHeight * _resolutionScaleFactor);
+        InventoryWindow.InventoryWindowWidth = (int)(InventoryWindow.InventoryWindowWidth * _resolutionScaleFactor);
+        // TextWindow.TextWindowHeight = (int)(TextWindow.TextWindowHeight * _resolutionScaleFactor);
+    }
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
+        _drawHelper = new DrawHelper(_gameService,_spriteBatch);
+        _debugTexture = new Texture2D(GraphicsDevice, 1, 1);
+        _debugTexture.SetData(new[] { Color.Red });
         foreach (var gameServiceObject in _gameService.CurrentMap.Objects)
         {
             if (gameServiceObject is not IVisible iVisible) continue;
@@ -98,7 +121,15 @@ public class Game1 : Game
         {
             _isActionPressed = false;
         }
-
+        if (!kstate.IsKeyDown(Keys.LeftAlt) && !kstate.IsKeyDown(Keys.Enter))
+        {
+            _isFullscreenPressed = false;
+        }
+        if (kstate.IsKeyDown(Keys.LeftAlt) && kstate.IsKeyDown(Keys.Enter) && _isFullscreenPressed == false)
+        {
+            
+            _isFullscreenPressed = true;
+        }
         if (_gameService.CurrentMap.Windows.OfType<TextWindow>().Any())
         {
             if (_isActionPressed) return;
@@ -161,7 +192,7 @@ public class Game1 : Game
 
         if (kstate.IsKeyDown(Keys.LeftControl) && mstate.ScrollWheelValue < _lastScrollWheelValue)
         {
-            _zoomFactor -= _zoomFactor <= 1F ? 0 : 0.1F;
+            _zoomFactor -= _zoomFactor <= 0.9F ? 0 : 0.1F;
         }
 
         _lastScrollWheelValue = mstate.ScrollWheelValue;
@@ -170,7 +201,51 @@ public class Game1 : Game
         _gameService.MoveInventoryOnPlayerPosition();
         base.Update(gameTime);
     }
+    protected override void Draw(GameTime gameTime)
+    {
+        float translateX = GraphicsDevice.Viewport.Width / 2 - (_gameService._playerOne.Middle.X * _zoomFactor);
+        float translateY = GraphicsDevice.Viewport.Height / 2 - (_gameService._playerOne.Middle.Y * _zoomFactor);
+        translateX = Math.Min(translateX, 0);
+        translateX = Math.Max(translateX, -(_gameService.CurrentMap.Width * _zoomFactor - GraphicsDevice.Viewport.Width));
+        translateY = Math.Min(translateY, 0);
+        translateY = Math.Max(translateY,-(_gameService.CurrentMap.Height * _zoomFactor - GraphicsDevice.Viewport.Height));
+        if(!_gameService.CurrentMap.IsTranslation)
+        {
+            translateX = GraphicsDevice.Viewport.Width / 2 - (_gameService.CurrentMap.Width/2 * _zoomFactor);
+            translateY = GraphicsDevice.Viewport.Height / 2 - (_gameService.CurrentMap.Height/2 * _zoomFactor);
+        }
+        Matrix zoomMatrix = Matrix.CreateScale(_zoomFactor) * Matrix.CreateTranslation(translateX, translateY, 0);
+        Matrix windowMatrix = Matrix.CreateScale(_resolutionScaleFactor, 1, 1);
+        GraphicsDevice.Clear(Color.Black);
+        _spriteBatch.Begin(transformMatrix: zoomMatrix);
+        _drawHelper.DrawMap(_gameService.CurrentMap);
+        _drawHelper.DrawGraphicObjects();
+        _drawHelper.DrawGameObjects();
+        _drawHelper.DrawObject(_gameService._playerOne);
+        DrawTopGraphicObjects();
+        // ShowExits();
+        _spriteBatch.End();
+        _spriteBatch.Begin();
+        _drawHelper.DrawWindows();
+        _spriteBatch.End();
 
+        base.Draw(gameTime);
+    }
+    public void DrawTopGraphicObjects()
+    {
+        foreach (var graphicTopObject in _gameService.CurrentMap.GraphicTopObjects)
+        {
+            DrawObject(graphicTopObject);
+        }
+    }
+    private void DrawObject(TopGraphic topGraphic)
+    {
+        topGraphic.Texture ??= Content.Load<Texture2D>(topGraphic.GraphicText);
+        _spriteBatch.Draw(topGraphic.Texture
+            , new Vector2(topGraphic.PositionX, topGraphic.PositionY)
+            , topGraphic.CurrentSprite
+            , Color.White);
+    }
     private GameItem GetItemUnderMouse(MouseState mstate)
     {
         if (_gameService.InventoryWindow.IsOpen)
@@ -187,152 +262,6 @@ public class Game1 : Game
 
         return null;
     }
-
-    protected override void Draw(GameTime gameTime)
-    {
-        float translateX = GraphicsDevice.Viewport.Width / 2 - (_gameService._playerOne.Middle.X * _zoomFactor);
-        float translateY = GraphicsDevice.Viewport.Height / 2 - (_gameService._playerOne.Middle.Y * _zoomFactor);
-        translateX = Math.Min(translateX, 0);
-        translateX = Math.Max(translateX,
-            -(_gameService.CurrentMap.Width * _zoomFactor - GraphicsDevice.Viewport.Width));
-        translateY = Math.Min(translateY, 0);
-        translateY = Math.Max(translateY,-(_gameService.CurrentMap.Height * _zoomFactor - GraphicsDevice.Viewport.Height));
-        Matrix zoomMatrix;
-        zoomMatrix = Matrix.CreateScale(_zoomFactor) * Matrix.CreateTranslation(translateX, translateY, 0);
-        GraphicsDevice.Clear(Color.Black);
-        _spriteBatch.Begin(transformMatrix: zoomMatrix);
-        DrawMap(_gameService.CurrentMap);
-        DrawGraphicObjects();
-        DrawGameObjects();
-        DrawObject(_gameService._playerOne);
-        DrawTopGraphicObjects();
-        _spriteBatch.End();
-        _spriteBatch.Begin();
-        DrawWindows();
-        _spriteBatch.End();
-
-        base.Draw(gameTime);
-    }
-
-    private void DrawGameObjects()
-    {
-        foreach (var gameObject in _gameService.CurrentMap.Objects)
-        {
-            DrawObject(gameObject);
-        }
-    }
-
-    private void DrawGraphicObjects()
-    {
-        foreach (var graphicObject in _gameService.CurrentMap.GraphicObjects)
-        {
-            DrawObject(graphicObject);
-        }
-    }
-    private void DrawTopGraphicObjects()
-    {
-        foreach (var graphicTopObject in _gameService.CurrentMap.GraphicTopObjects)
-        {
-            DrawObject(graphicTopObject);
-        }
-    }
-    private void DrawMap(Map map)
-    {
-        _spriteBatch.Draw(map.Texture
-            , new Vector2(0, 0)
-            , Color.White);
-    }
-
-    private void DrawWindows()
-    {
-        var windows = _gameService.CurrentMap.Windows.ToArray();
-        for (int i = windows.Length - 1; i >= 0; i--)
-        {
-            DrawObject(windows[i]);
-            if (windows[i] is TextWindow textWindow)
-            {
-                DrawObjects(textWindow.Title);
-                DrawObjects(textWindow.Content);
-                if (_flickerCounter >= FlickerTime)
-                    DrawObjects(textWindow.Next);
-                if (_flickerCounter >= FlickerTime * 2)
-                    _flickerCounter = 0;
-                _flickerCounter++;
-            }
-        }
-
-        if (windows.Any()) return;
-        if (!_gameService.InventoryWindow.IsOpen) return;
-        DrawObject(_gameService.InventoryWindow);
-        DrawObjects(_gameService.InventoryWindow.Title);
-        DrawInventory();
-    }
-
-    private void DrawInventory()
-    {
-        foreach (var item in _gameService.InventoryWindow.Inventory)
-        {
-            DrawObject(item);
-        }
-    }
-
-    private void DrawText(IEnumerable<GameObject> gameObjects, float scale)
-    {
-        foreach (var gameObject in gameObjects)
-        {
-            DrawObjectWithScale(gameObject, scale);
-        }
-    }
-
-    private void DrawObjects(IEnumerable<GameObject> gameObjects)
-    {
-        foreach (var gameObject in gameObjects)
-        {
-            DrawObject(gameObject);
-        }
-    }
-    private void DrawObject(TopGraphic topGraphic)
-    {
-        topGraphic.Texture ??= Content.Load<Texture2D>(topGraphic.GraphicText);
-        _spriteBatch.Draw(topGraphic.Texture
-            , new Vector2(topGraphic.PositionX, topGraphic.PositionY)
-            , topGraphic.CurrentSprite
-            , Color.White);
-    }
-    private void DrawObject(GameObject gameObject)
-    {
-        if (gameObject is not IVisible visible) return;
-        _spriteBatch.Draw(visible.GetTexture()
-            , new Vector2(gameObject.PositionX, gameObject.PositionY)
-            , gameObject.CurrentSprite
-            , Color.White);
-    }
-
-    private void DrawObjectWithScale(GameObject gameObject, float scale)
-    {
-        if (gameObject is not IVisible visible) return;
-        _spriteBatch.Draw(
-            visible.GetTexture(),
-            new Vector2(gameObject.PositionX, gameObject.PositionY),
-            null,
-            Color.White,
-            0f,
-            new Vector2(0, 0),
-            scale,
-            SpriteEffects.None,
-            0f
-        );
-    }
-
-    private void DrawObject(GameItem gameItem)
-    {
-        if (gameItem is not IVisible visible) return;
-        _spriteBatch.Draw(visible.GetTexture()
-            , new Vector2(gameItem.PositionX, gameItem.PositionY)
-            , gameItem.CurrentSprite
-            , Color.White);
-    }
-
     private void MovePlayerOnInput(GameTime gameTime, KeyboardState kstate)
     {
         PlayerState newPlayerState = PlayerState.Neutral;
@@ -382,7 +311,6 @@ public class Game1 : Game
             if(isNewMap) LoadContent();
         }
     }
-
     private void RunProgram(string programPath)
     {
         try
@@ -405,4 +333,11 @@ public class Game1 : Game
             _gameService.AddTextWindow("Error", string.Concat("Could not start program: ", ex.Message.AsSpan(0, 20)));
         }
     }
+    private void ShowExits()
+    {
+        foreach (var exit in _gameService.CurrentMap.MapExits.Keys)
+        {
+            _spriteBatch.Draw(_debugTexture, new Rectangle((int)exit.X-5, (int)exit.Y-5, 10, 10), Color.Red);
+        }
+    }    
 }

@@ -12,7 +12,7 @@ namespace Portfolio_Game_Core.Services;
 
 public class GameService
 {
-    private int _topMargin = 35;
+    private int _topMargin = 30;
     private WindowCreator _windowCreator;
     private int _delayCounter;
     private int _delayTime;
@@ -32,7 +32,6 @@ public class GameService
         {
             map.SeedNextMaps();
         }
-        
     }
 
     public void AddObject(GameObject gameObject)
@@ -154,7 +153,7 @@ public class GameService
                 string title = CurrentMap.Interactables[0].ResultTexts[0].Item1;
                 string content = CurrentMap.Interactables[0].ResultTexts[0].Item2;
                 CurrentMap.Interactables[0].ResultTexts.RemoveAt(0);
-                CurrentMap.Windows.Add(_windowCreator.GetTextWindow(title, content));
+                CurrentMap.Windows.Add(CurrentMap.GetTextWindow(title,content));
                 break;
             case ResultAction.AddToInventory:
                 var hasInventory = (IHasInventory)CurrentMap.Interactables[0];
@@ -250,8 +249,8 @@ public class GameService
     }
     public bool ChangeMapIfNecessary(PlayerState playerState)
     {
-        int precisionX = playerState is PlayerState.Up or PlayerState.Down ? 25 : 5; 
-        int precisionY = playerState is PlayerState.Left or PlayerState.Right ? 25 : 5; 
+        int precisionX = playerState is PlayerState.Up or PlayerState.Down ? 30 : 15;
+        int precisionY = playerState is PlayerState.Left or PlayerState.Right ? 30 : 15; 
         foreach (var exit in CurrentMap.MapExits.Keys)
         {
             if (Math.Abs(_playerOne.Middle.X - exit.X) < precisionX && Math.Abs(_playerOne.Middle.Y - exit.Y) < precisionY)

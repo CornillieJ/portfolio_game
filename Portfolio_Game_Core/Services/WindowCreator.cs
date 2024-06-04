@@ -7,6 +7,8 @@ public class WindowCreator
 {
     private float _screenWidth;
     private float _screenHeight;
+    public static int WindowMargin { get; set; } = 20;
+
     public WindowCreator(float screenWidth, float screenHeight)
     {
         _screenHeight = screenHeight;
@@ -16,7 +18,7 @@ public class WindowCreator
     {
         int width = TextWindow.TextWindowWidth;
         int height = TextWindow.TextWindowHeight;
-        return new TextWindow(_screenWidth/2 - width / 2, _screenHeight - height - 20,title,content);
+        return new TextWindow(_screenWidth/2 - width / 2, _screenHeight - height - WindowMargin,title,content);
     } 
     public IEnumerable<TextWindow> GetTextWindows(IEnumerable<string> titles, IEnumerable<string> contents)
     {

@@ -13,6 +13,7 @@ public class FirstMap:Map
 {
     public FirstMap(float screenWidth, float screenHeight) : base(screenWidth, screenHeight)
     {
+        IsTranslation = false;
         Width = 800;
         Height = 480;
         GetFloor();
@@ -24,9 +25,9 @@ public class FirstMap:Map
 
     public override void SeedNextMaps()
     {
-        MapExits.Add(new Vector2(ScreenSize.X/2,5),( MapService.Maps["garden"],Direction.Up));
-        MapExits.Add(new Vector2(ScreenSize.X/2,ScreenSize.Y-5),( MapService.Maps["garden"],Direction.Down));
-        MapExits.Add(new Vector2(ScreenSize.X-5,ScreenSize.Y/2),(MapService.Maps["bathroom"],Direction.Right));
+        MapExits.Add(new Vector2(Width/2,5),( MapService.Maps["garden"],Direction.Up));
+        MapExits.Add(new Vector2(Width/2,Height-5),( MapService.Maps["garden"],Direction.Down));
+        MapExits.Add(new Vector2(Width-5,Height/2),(MapService.Maps["bathroom"],Direction.Right));
     }
 
     protected override void SeedObjects()
@@ -43,7 +44,7 @@ public class FirstMap:Map
 
     protected override void SeedGraphicObjects()
     {
-       // GraphicObjects.Add(new Carpet((int)(ScreenSize.X/2 - Carpet.carpetWidth/2),(int)(ScreenSize.Y/2 - Carpet.carpetHeight/2)));
+       // GraphicObjects.Add(new Carpet((int)(Width/2 - Carpet.carpetWidth/2),(int)(Height/2 - Carpet.carpetHeight/2)));
     }
 
     protected override void SeedStartText()
@@ -54,8 +55,8 @@ public class FirstMap:Map
     protected override void SeedWalls()
     {
         int height = Wall.WallHeight;
-        var walls = MapHelper.GetWallsSurroundingMap(ScreenSize);
-        walls = walls.Where(w=>Math.Abs(w.Middle.Y - ScreenSize.Y/2) > 5 && Math.Abs(w.Middle.X - ScreenSize.X/2) > 5 || w.Left <20).ToList();
+        var walls = MapHelper.GetWallsSurroundingMap(new Vector2(Width,Height));
+        walls = walls.Where(w=>Math.Abs(w.Middle.Y - Height/2) > 5 && Math.Abs(w.Middle.X - Width/2) > 5 || w.Left <20).ToList();
         walls.AddRange(new List<Wall>()
         {
             new Wall(180, 0, Direction.Neutral),
@@ -67,19 +68,19 @@ public class FirstMap:Map
         });
         walls.AddRange(new List<Wall>()
         {
-            new Wall(250, (int)(ScreenSize.Y - height), Direction.Neutral),
-            new Wall(250, (int)(ScreenSize.Y - height * 2), Direction.Right,Direction.Neutral),
-            new Wall(250, (int)(ScreenSize.Y - height * 3), Direction.Right,Direction.Neutral),
-            new Wall(250, (int)(ScreenSize.Y - height * 4), Direction.Right,Direction.Neutral),
-            new Wall(250, (int)(ScreenSize.Y - height * 5), Direction.Right,Direction.Up),
+            new Wall(250, (int)(Height - height), Direction.Neutral),
+            new Wall(250, (int)(Height - height * 2), Direction.Right,Direction.Neutral),
+            new Wall(250, (int)(Height - height * 3), Direction.Right,Direction.Neutral),
+            new Wall(250, (int)(Height - height * 4), Direction.Right,Direction.Neutral),
+            new Wall(250, (int)(Height - height * 5), Direction.Right,Direction.Up),
         });
         walls.AddRange(new List<Wall>()
         {
-            new Wall((int)(ScreenSize.X - 250), (int)(ScreenSize.Y - height), Direction.Neutral),
-            new Wall((int)(ScreenSize.X - 250), (int)(ScreenSize.Y - height * 2), Direction.Right,Direction.Neutral),
-            new Wall((int)(ScreenSize.X - 250), (int)(ScreenSize.Y - height * 3), Direction.Right,Direction.Neutral),
-            new Wall((int)(ScreenSize.X - 250), (int)(ScreenSize.Y - height * 4), Direction.Right,Direction.Neutral),
-            new Wall((int)(ScreenSize.X - 250), (int)(ScreenSize.Y - height * 5), Direction.Right,Direction.Up),
+            new Wall((int)(Width - 250), (int)(Height - height), Direction.Neutral),
+            new Wall((int)(Width - 250), (int)(Height - height * 2), Direction.Right,Direction.Neutral),
+            new Wall((int)(Width - 250), (int)(Height - height * 3), Direction.Right,Direction.Neutral),
+            new Wall((int)(Width - 250), (int)(Height - height * 4), Direction.Right,Direction.Neutral),
+            new Wall((int)(Width - 250), (int)(Height - height * 5), Direction.Right,Direction.Up),
         });
         Objects.AddRange(walls);
         Objects.Add(new WindowInWall(Wall.WallWidth*3,0));
@@ -92,16 +93,16 @@ public class FirstMap:Map
         switch (entryDirection)
         {
             case Direction.Up:
-                EntryLocation = new Vector2((int)(ScreenSize.X / 2 - (float)Player.PlayerWidth/2), ScreenSize.Y - 40);
+                EntryLocation = new Vector2((int)(Width / 2 - (float)Player.PlayerWidth/2), Height - 80);
                 break;
             case Direction.Down:
-                EntryLocation = new Vector2((int)(ScreenSize.X / 2 - (float)Player.PlayerWidth/2), 10);
+                EntryLocation = new Vector2((int)(Width / 2 - (float)Player.PlayerWidth/2), 10);
                 break;
             case Direction.Left:
-                EntryLocation = new Vector2(ScreenSize.X - 35, (int)(ScreenSize.Y / 2 - 10 - (float)Player.PlayerHeight/2));
+                EntryLocation = new Vector2(Width - 35, (int)(Height / 2 - 10 - (float)Player.PlayerHeight/2));
                 break;
             case Direction.Neutral:
-                EntryLocation = new Vector2((int)(ScreenSize.X / 2 - 10 - (float)Player.PlayerWidth/2), (int)(ScreenSize.Y / 2 - (float)Player.PlayerHeight/2));
+                EntryLocation = new Vector2((int)(Width / 2 - 10 - (float)Player.PlayerWidth/2), (int)(Height / 2 - (float)Player.PlayerHeight/2));
                 break;
         } 
     }

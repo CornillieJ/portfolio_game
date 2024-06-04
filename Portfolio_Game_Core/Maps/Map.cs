@@ -11,6 +11,7 @@ public abstract class Map
 {
     public int Width { get; set; }
     public int Height { get; set; }
+    
     public Dictionary<Vector2, (Map?,Direction)> MapExits = new();
     public List<GameObject> Objects { get; set; }
     public List<GameObject> GraphicObjects { get; set; }
@@ -23,6 +24,7 @@ public abstract class Map
     public Floor Floor { get; set; }
     public Vector2 EntryLocation { get; set; }
     public Texture2D Texture { get; set; }
+    public bool IsTranslation { get; set; } = true;
 
     public Map(float screenWidth, float screenHeight, Direction entryDirection = Direction.Neutral)
     {
@@ -35,6 +37,10 @@ public abstract class Map
         _windowCreator = new WindowCreator(screenWidth, screenHeight);
     }
 
+    public Window GetTextWindow(string title, string content)
+    {
+       return _windowCreator.GetTextWindow(title, content);
+    }
     public abstract void GetEntryLocation(Direction entryDirection);
 
     public abstract void SeedNextMaps();

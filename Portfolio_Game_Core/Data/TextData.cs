@@ -14,7 +14,6 @@ public static class TextData
     public static readonly string[] ChestTexts =
     {
         "You took a program out of the chest, have a look in your inventory to run it.",
-
     };
 
     public static readonly Dictionary<string, string> ItemTexts = new()
