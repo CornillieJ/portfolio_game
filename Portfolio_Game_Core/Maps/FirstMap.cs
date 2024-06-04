@@ -35,6 +35,49 @@ public class FirstMap:Map
         var chestTankie = new Chest(50, 50, new Tankie(0));
         chestTankie.ResultTexts.Add(("chest", TextData.ChestTexts[0]));
         Objects.Add(chestTankie);
+        ResultAction[] chairActions = { ResultAction.MovePlayer,ResultAction.AddObject};
+        Generic[] chairs =
+        {
+            new(545, 58, 32, 54, "chairLeft","",chairActions,true),
+            new(545, 95, 32, 54, "chairLeft","",chairActions,true),
+            new(660, 58, 32, 54, "chairRight","",chairActions,true),
+            new(660, 95, 32, 54, "chairRight","",chairActions,true)
+        };
+        Generic table = new(570,60,96,93,"table");
+        Generic tableForBoundaries = new(585,70,60,60,"table");
+        foreach (var chair in chairs)
+        { 
+            // chair.ObjectAdditions.Add(new TopGraphic(570,50,96,93,"table")); 
+            // chair.ObjectAdditions.Add(new TopGraphic(630,92,28,28,"chessboard"));
+            if(chair.GraphicText == "chairLeft")
+                chair.ResultMovePositions.Add((new Vector2(chair.PositionX,chair.PositionY-10),PlayerState.Right));
+            else
+                chair.ResultMovePositions.Add((new Vector2(chair.PositionX,chair.PositionY-10),PlayerState.Left));
+            Objects.Add(chair);
+            chair.VisionYMarginOverride = 20;
+        }
+        Objects.Add(tableForBoundaries);
+        Objects.Add(table);
+        Generic chessBoard = new(630,102,28,28,"chessboard","",
+            new[]
+            {
+                ResultAction.ShowText,
+                ResultAction.ShowText,
+                ResultAction.ShowText,
+                ResultAction.AddToInventory,
+                ResultAction.RemoveObject,
+                ResultAction.RemoveObject,
+            }, true);
+        foreach (string text in TextData.ObjectsTexts["Chessboard"])
+        {
+            chessBoard.ResultTexts.Add(("Chessboard", text));
+        }
+        chessBoard.ObjectAdditions.Add(chessBoard);
+        chessBoard.ObjectAdditions.Add(new TopGraphic(630,102,28,28,"chessboard"));
+        chessBoard.Inventory.Add(new Chess(0));
+        GraphicMiddleObjects.Add(new TopGraphic(570,60,96,93,"table"));
+        GraphicMiddleObjects.Add(new TopGraphic(630,102,28,28,"chessboard"));
+        Objects.Add(chessBoard);
     }
 
     protected override void GetFloor()

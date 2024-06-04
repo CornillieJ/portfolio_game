@@ -94,10 +94,23 @@ public class DrawHelper
         }
     }
 
+    public void DrawPlayer(Texture2D head)
+    {
+        DrawObject(_gameService._playerOne);
+        DrawHead(head);
+    }
     public void DrawObject(GameObject gameObject)
     {
         if (gameObject is not IVisible visible) return;
         _spriteBatch.Draw(visible.GetTexture()
+            , new Vector2(gameObject.PositionX, gameObject.PositionY)
+            , gameObject.CurrentSprite
+            , Color.White);
+    }
+    public void DrawHead(Texture2D head)
+    {
+        GameObject gameObject = _gameService._playerOne;
+        _spriteBatch.Draw(head
             , new Vector2(gameObject.PositionX, gameObject.PositionY)
             , gameObject.CurrentSprite
             , Color.White);

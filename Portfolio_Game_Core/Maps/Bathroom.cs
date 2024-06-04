@@ -32,9 +32,8 @@ public class Bathroom:Map
 
     protected override void SeedObjects()
     {
-        var bath = new Generic(30, 65, 97, 67, "bath",TextData.ObjectEndTexts["Bath"], () =>
-        {
-            return new[]
+        var bath = new Generic(30, 65, 97, 67, "bath", TextData.ObjectEndTexts["Bath"],
+            new[]
             {
                 ResultAction.ShowText,
                 ResultAction.MovePlayer,
@@ -52,8 +51,7 @@ public class Bathroom:Map
                 ResultAction.ShowText,
                 ResultAction.AddToInventory,
                 ResultAction.SwitchObjectState,
-            };
-        });
+            }, true);
         foreach (string text in TextData.ObjectsTexts["Bath"])
         {
             bath.ResultTexts.Add(("Bath", text));
