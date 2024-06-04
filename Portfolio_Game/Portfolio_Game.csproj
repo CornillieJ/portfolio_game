@@ -902,6 +902,86 @@
       <Content Include="Programs\OuterWilds\fonts\specimen_files\specimen_stylesheet.css">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
+      <None Remove="Programs\Chess\.editorconfig" />
+      <Content Include="Programs\Chess\.editorconfig">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Programs\Chess\.prettierrc" />
+      <Content Include="Programs\Chess\.prettierrc">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Programs\Chess\css.css" />
+      <Content Include="Programs\Chess\css.css">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Programs\Chess\index.html" />
+      <Content Include="Programs\Chess\index.html">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Programs\Chess\interface.js" />
+      <Content Include="Programs\Chess\interface.js">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Programs\Chess\script.js" />
+      <Content Include="Programs\Chess\script.js">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Programs\Chess\script2.js" />
+      <Content Include="Programs\Chess\script2.js">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Programs\Chess\wiki.md" />
+      <Content Include="Programs\Chess\wiki.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Programs\Chess\img\bbishop.png" />
+      <Content Include="Programs\Chess\img\bbishop.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Programs\Chess\img\bking.png" />
+      <Content Include="Programs\Chess\img\bking.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Programs\Chess\img\bknight.png" />
+      <Content Include="Programs\Chess\img\bknight.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Programs\Chess\img\bpawn.png" />
+      <Content Include="Programs\Chess\img\bpawn.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Programs\Chess\img\bqueen.png" />
+      <Content Include="Programs\Chess\img\bqueen.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Programs\Chess\img\brook.png" />
+      <Content Include="Programs\Chess\img\brook.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Programs\Chess\img\wbishop.png" />
+      <Content Include="Programs\Chess\img\wbishop.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Programs\Chess\img\wking.png" />
+      <Content Include="Programs\Chess\img\wking.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Programs\Chess\img\wknight.png" />
+      <Content Include="Programs\Chess\img\wknight.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Programs\Chess\img\wpawn.png" />
+      <Content Include="Programs\Chess\img\wpawn.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Programs\Chess\img\wqueen.png" />
+      <Content Include="Programs\Chess\img\wqueen.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Programs\Chess\img\wrook.png" />
+      <Content Include="Programs\Chess\img\wrook.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
     <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
         <Message Text="Restoring dotnet tools" Importance="High"/>

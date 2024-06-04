@@ -35,6 +35,7 @@ public class Game1 : Game
     private int _interactCounter = 0;
     private Vector2 _initialPlayerPosition = new(0, 0);
     private DrawHelper _drawHelper;
+    private Texture2D _headTexture; 
 
     public Game1()
     {
@@ -98,6 +99,7 @@ public class Game1 : Game
             graphicTopObject.Texture = Content.Load<Texture2D>(graphicTopObject.GraphicText);
         }
         Player.Texture = Content.Load<Texture2D>("character");
+        _headTexture = Content.Load<Texture2D>("characterhead");
         MapService.Maps["house-entry"].Texture = Content.Load<Texture2D>("houseentry");
         MapService.Maps["bathroom"].Texture = Content.Load<Texture2D>("houseentry");
         MapService.Maps["garden"].Texture = Content.Load<Texture2D>("overworldtemp");
@@ -107,6 +109,7 @@ public class Game1 : Game
         InventoryWindow.Texture = Content.Load<Texture2D>("inventorywindow");
         Tankie.Texture = Content.Load<Texture2D>("tank");
         OuterWilds.Texture = Content.Load<Texture2D>("outerwilds");
+        Chess.Texture = Content.Load<Texture2D>("chess");
         Text.Texture = Content.Load<Texture2D>("font2");
  
     }
@@ -154,9 +157,12 @@ public class Game1 : Game
         if ((kstate.IsKeyDown(Keys.Space) || kstate.IsKeyDown(Keys.Enter)) && _isActionPressed == false)
         {
             _isActionPressed = true;
-            var gameObjectInView = _gameService.GetObjectPlayerIsLookingAt();
-            if (gameObjectInView is IInteractable interactable)
-                _gameService.AddInteraction(interactable);
+            var gameObjectsInView = _gameService.GetObjectsPlayerIsLookingAt();
+            foreach (var gameObjectInView in gameObjectsInView)
+            {
+                if (gameObjectInView is IInteractable interactable)
+                    _gameService.AddInteraction(interactable);
+            }
         }
 
         if ((kstate.IsKeyDown(Keys.I) || kstate.IsKeyDown(Keys.Tab)) && _isInventoryPressed == false)
@@ -222,6 +228,8 @@ public class Game1 : Game
         _drawHelper.DrawGraphicObjects();
         _drawHelper.DrawGameObjects();
         _drawHelper.DrawObject(_gameService._playerOne);
+        DrawMiddleGraphicObjects();
+        _drawHelper.DrawHead(_headTexture);
         DrawTopGraphicObjects();
         // ShowExits();
         _spriteBatch.End();
@@ -230,6 +238,13 @@ public class Game1 : Game
         _spriteBatch.End();
 
         base.Draw(gameTime);
+    }
+    public void DrawMiddleGraphicObjects()
+    {
+        foreach (var graphicMiddleObject in _gameService.CurrentMap.GraphicMiddleObjects)
+        {
+            DrawObject(graphicMiddleObject);
+        }
     }
     public void DrawTopGraphicObjects()
     {
