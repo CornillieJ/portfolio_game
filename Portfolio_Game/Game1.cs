@@ -280,6 +280,10 @@ public class Game1 : Game
     private void MovePlayerOnInput(GameTime gameTime, KeyboardState kstate)
     {
         PlayerState newPlayerState = PlayerState.Neutral;
+        if (kstate.IsKeyDown(Keys.LeftShift))
+            _gameService._playerOne.Speed = Player.RunSpeed;
+        else
+            _gameService._playerOne.Speed = Player.WalkSpeed;
         if (kstate.IsKeyDown(Keys.W))
         {
             newPlayerState = PlayerState.Up;

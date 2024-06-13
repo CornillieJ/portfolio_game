@@ -6,10 +6,12 @@ namespace Portfolio_Game_Core;
 
 public class Player : GameObject, IMovable, IVisible
 {
+    public static float WalkSpeed = 150;
+    public static float RunSpeed = 250;
     public static int PlayerWidth { get; set; } = 32;
     public static int PlayerHeight { get; set; } = 64;
     public static Texture2D Texture { get; set; }
-    public float Speed { get; set; } = 150;
+    public float Speed { get; set; } = WalkSpeed;
     private int _spriteChangeSpeed = 10;
     private int _spriteNumber;
     public PlayerState PlayerState { get; set; }
