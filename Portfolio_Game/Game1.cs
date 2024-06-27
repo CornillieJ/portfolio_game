@@ -113,6 +113,7 @@ public class Game1 : Game
         TextWindow.Texture = Content.Load<Texture2D>("window200");
         InventoryWindow.Texture = Content.Load<Texture2D>("inventorywindow");
         Tankie.Texture = Content.Load<Texture2D>("tank");
+        BongoCat.Texture = Content.Load<Texture2D>("KerSplash");
         OuterWilds.Texture = Content.Load<Texture2D>("outerwilds");
         Chess.Texture = Content.Load<Texture2D>("chess");
         Text.Texture = Content.Load<Texture2D>("font2");
@@ -150,8 +151,9 @@ public class Game1 : Game
             base.Update(gameTime);
             return;
         }
-
         //Only check input up to here if there are open text windows (no walking allowed if open)
+
+        //this checks if any interactions have been added to interactables. if so, will interact with them
         if (_gameService.CurrentMap.Interactables.Any())
         {
             _gameService.InteractAll(ref _interactCounter, ref _initialPlayerPosition);
@@ -159,6 +161,7 @@ public class Game1 : Game
         }
         _interactCounter = 0;
         MovePlayerOnInput(gameTime, kstate);
+        MoveRandomNPCs(gameTime);
         if ((kstate.IsKeyDown(Keys.Space) || kstate.IsKeyDown(Keys.Enter)) && _isActionPressed == false)
         {
             _isActionPressed = true;
@@ -212,6 +215,21 @@ public class Game1 : Game
         _gameService.MoveInventoryOnPlayerPosition();
         base.Update(gameTime);
     }
+    private void MoveRandomNPCs(GameTime gameTime)
+    {
+        foreach (var movingNPC in _gameService.CurrentMap.Objects.OfType<MovingNPC>())
+        {
+            Direction direction;
+            if (movingNPC.isWalking)
+                direction = movingNPC.Direction;
+            else
+                direction = _gameService.GetRandomDirection();
+            bool canMove = _gameService.CanMove(movingNPC, direction,
+                (float)gameTime.ElapsedGameTime.TotalSeconds);
+            movingNPC.Move(direction,(float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
+        }
+    }
+
     protected override void Draw(GameTime gameTime)
     {
         float translateX = GraphicsDevice.Viewport.Width / 2 - (_gameService._playerOne.Middle.X * _zoomFactor);
@@ -334,24 +352,18 @@ public class Game1 : Game
             bool isNewMap = _gameService.ChangeMapIfNecessary(newPlayerState);
             if(isNewMap) LoadContent();
         }
-
-        foreach (var movingNPC in _gameService.CurrentMap.Objects.OfType<MovingNPC>())
-        {
-            Direction direction;
-            if (movingNPC.isWalking)
-                direction = movingNPC.Direction;
-            else
-                direction = _gameService.GetRandomDirection();
-            bool canMove = _gameService.CanMove(movingNPC, direction,
-                (float)gameTime.ElapsedGameTime.TotalSeconds);
-            movingNPC.Move(direction,(float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
-        }
     }
     private void RunProgram(string programPath)
     {
         try
         {
-            Process.Start(programPath);
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                FileName = programPath,
+                // Set the working directory to the directory of the executable
+                WorkingDirectory = System.IO.Path.GetDirectoryName(programPath)
+            };
+            Process.Start(startInfo);
         }
         catch (Exception ex)
         {

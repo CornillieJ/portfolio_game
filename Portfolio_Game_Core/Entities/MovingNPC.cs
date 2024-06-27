@@ -1,11 +1,16 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Portfolio_Game_Core.Entities.Base;
 using Portfolio_Game_Core.Interfaces;
 
 namespace Portfolio_Game_Core.Entities;
 
-public class MovingNPC: GameObject, IMovable, IVisible
+public class MovingNPC: GameObject, IMovable, IVisible, IInteractable, IHasInventory
 {
+    
+    public bool Interacted { get; set; }
+    public bool IsInteractable { get; set; } = true;
+    public ResultAction[] Interactions { get; set; }
     public string GraphicText { get; set; }
     private ISpriteData NPCSpriteData { get; set; }
     public static float WalkSpeed = 75;
@@ -22,6 +27,11 @@ public class MovingNPC: GameObject, IMovable, IVisible
     private int _spriteNumber;
     public int _currentWalkDuration = 0;
     public bool isWalking= false;
+    public List<GameItem> Inventory { get; set; }
+    public void ShowInventory()
+    {
+    }
+
     public PlayerState PlayerState { get; set; }
     public Direction Direction { get; set; }
 
@@ -36,6 +46,11 @@ public class MovingNPC: GameObject, IMovable, IVisible
         _spriteNumber = 0;
         GraphicText = graphicText;
         maxSpriteCount = spriteData.SpriteCount;
+        ResultTexts = new List<(string, string)>();
+        ResultMovePositions = new List<(Vector2, PlayerState)>();
+        ResultDelays = new List<int>();
+        ObjectAdditions = new List<GameObject>();
+        Inventory = new List<GameItem>();
     }
     public MovingNPC(int x, int y,string graphicText, ISpriteData spriteData) : this(graphicText,spriteData)
     {
@@ -231,4 +246,20 @@ public class MovingNPC: GameObject, IMovable, IVisible
     {
         Texture = texture;
     }
+
+    public ResultAction[] Interact()
+    {
+        if (!IsInteractable || Interactions is null) return new[] { ResultAction.Nothing };
+        return !Interacted ? Interactions : new []{ResultAction.NoMoreInteraction };
+    }
+    public void SwitchState()
+    {
+        Interacted = true;
+    }
+
+    public List<(string, string)> ResultTexts { get; set; }
+    public List<(Vector2, PlayerState)> ResultMovePositions { get; set; }
+    public List<int> ResultDelays { get; set; }
+    public List<GameObject> ObjectAdditions { get; set; }
+    public (string, string) NoInteractionText { get; set; }
 }

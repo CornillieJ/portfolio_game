@@ -26,7 +26,16 @@ public class FirstMap:Map
 
     private void SeedMovables()
     {
-        Objects.Add(new MovingNPC(100,100,"cat",new CatSpriteData()));
+        MovingNPC cat = new MovingNPC(100, 100, "cat", new CatSpriteData());
+        cat.Inventory.Add(new BongoCat(0));
+        cat.ObjectAdditions.Add(cat);
+        foreach (string text in TextData.ObjectsTexts["Cat"])
+        {
+            cat.ResultTexts.Add(("Cat", text));
+        } 
+        cat.Interactions = new[]
+            { ResultAction.ShowText, ResultAction.ShowText,ResultAction.ShowText, ResultAction.AddToInventory, ResultAction.RemoveObject };
+        Objects.Add(cat);
     }
 
     public override void SeedNextMaps()
