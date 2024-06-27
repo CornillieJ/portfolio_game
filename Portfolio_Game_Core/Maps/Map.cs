@@ -15,7 +15,7 @@ public abstract class Map
     public Dictionary<Vector2, (Map?,Direction)> MapExits = new();
     public List<GameObject> Objects { get; set; }
     public List<GameObject> GraphicObjects { get; set; }
-    
+    public List<IMovable> MovableObjects { get; set; }
     public List<TopGraphic> GraphicMiddleObjects { get; set; }
     public List<TopGraphic> GraphicTopObjects { get; set; }
     public List<Window> Windows { get; set; }
@@ -37,6 +37,7 @@ public abstract class Map
         GraphicTopObjects = new List<TopGraphic>();
         Windows = new List<Window>();
         Interactables = new List<IInteractable>();
+        MovableObjects = new List<IMovable>();
         _windowCreator = new WindowCreator(screenWidth, screenHeight);
     }
 

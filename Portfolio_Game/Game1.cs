@@ -80,13 +80,17 @@ public class Game1 : Game
         foreach (var gameServiceObject in _gameService.CurrentMap.Objects)
         {
             if (gameServiceObject is not IVisible iVisible) continue;
-            if (gameServiceObject is Generic generic)
+            switch (gameServiceObject)
             {
-                generic.Texture = Content.Load<Texture2D>(generic.GraphicText);
-            }
-            else
-            {
-                iVisible.SetTexture(Content.Load<Texture2D>("objects"));
+                case Generic generic:
+                    generic.Texture = Content.Load<Texture2D>(generic.GraphicText);
+                    break;
+                case MovingNPC movingNPC:
+                    movingNPC.Texture = Content.Load<Texture2D>(movingNPC.GraphicText);
+                    break;
+                default:
+                    iVisible.SetTexture(Content.Load<Texture2D>("objects"));
+                    break;
             }
         }
         foreach (var graphicObject in _gameService.CurrentMap.GraphicObjects)
@@ -99,6 +103,7 @@ public class Game1 : Game
             graphicTopObject.Texture = Content.Load<Texture2D>(graphicTopObject.GraphicText);
         }
         Player.Texture = Content.Load<Texture2D>("character");
+        // Player.Texture = Content.Load<Texture2D>("cat");
         _headTexture = Content.Load<Texture2D>("characterhead");
         MapService.Maps["house-entry"].Texture = Content.Load<Texture2D>("houseentry");
         MapService.Maps["bathroom"].Texture = Content.Load<Texture2D>("houseentry");
@@ -287,9 +292,9 @@ public class Game1 : Game
         if (kstate.IsKeyDown(Keys.W))
         {
             newPlayerState = PlayerState.Up;
+            Direction secondDirection = Direction.Neutral;
             bool canMove = _gameService.CanMove(_gameService._playerOne, Direction.Up,
                 (float)gameTime.ElapsedGameTime.TotalSeconds);
-            Direction secondDirection = Direction.Neutral;
             if (kstate.IsKeyDown(Keys.A) && _gameService.CanMove(_gameService._playerOne, Direction.Left,
                     (float)gameTime.ElapsedGameTime.TotalSeconds)) secondDirection = Direction.Left;
             if (kstate.IsKeyDown(Keys.D) && _gameService.CanMove(_gameService._playerOne, Direction.Right,
@@ -328,6 +333,18 @@ public class Game1 : Game
         {
             bool isNewMap = _gameService.ChangeMapIfNecessary(newPlayerState);
             if(isNewMap) LoadContent();
+        }
+
+        foreach (var movingNPC in _gameService.CurrentMap.Objects.OfType<MovingNPC>())
+        {
+            Direction direction;
+            if (movingNPC.isWalking)
+                direction = movingNPC.Direction;
+            else
+                direction = _gameService.GetRandomDirection();
+            bool canMove = _gameService.CanMove(movingNPC, direction,
+                (float)gameTime.ElapsedGameTime.TotalSeconds);
+            movingNPC.Move(direction,(float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
         }
     }
     private void RunProgram(string programPath)

@@ -139,5 +139,5 @@ public class DrawHelper
             , new Vector2(gameItem.PositionX, gameItem.PositionY)
             , gameItem.CurrentSprite
             , Color.White);
-    } 
+    }
 }

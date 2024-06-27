@@ -22,6 +22,7 @@ public class GameService
     public Map CurrentMap { get; set; }
     public InventoryWindow InventoryWindow { get; set; }
 
+    private Random _random = new Random();
     public GameService(int screenWidth, int screenHeight)
     {
         CurrentMap = MapService.Maps["house-entry"];
@@ -57,43 +58,13 @@ public class GameService
     }
     public bool CanMove(IMovable movable, Direction direction, float deltaTime)
     {
-        if (movable is not Player player) return false;
-        float speed = player.Speed * deltaTime;
         foreach (var gameObject in CurrentMap.Objects)
         {
-            switch (direction)
-            {
-               case Direction.Right:
-                   if (gameObject.Top <= player.Bottom 
-                       && gameObject.Bottom >= player.Top + _topMargin
-                       && gameObject.Left >= player.Right 
-                       && player.Right + speed > gameObject.Left)
-                       return false;
-                   break;
-               case Direction.Left:
-                   if (gameObject.Top <= player.Bottom 
-                       && gameObject.Bottom >= player.Top + _topMargin
-                       && gameObject.Right <= player.Left 
-                       && player.Left - speed < gameObject.Right)
-                       return false;
-                   break;
-               case Direction.Up:
-                   if (gameObject.Bottom <= player.Top + _topMargin
-                       && gameObject.Bottom >= player.Top + _topMargin - speed 
-                       && gameObject.Left <= player.Right 
-                       && gameObject.Right >= player.Left)
-                       return false;
-                   break;
-                  case Direction.Down:
-                      if (gameObject.Top >= player.Bottom 
-                          && gameObject.Top <= player.Bottom + speed 
-                          && gameObject.Left <= player.Right 
-                          && gameObject.Right >= player.Left)
-                          return false;
-                      break;
-            }
+            bool isFirstDirectionOk = CheckColission(movable, gameObject, direction, deltaTime);
+            if (isFirstDirectionOk == false) return false;
         }
-
+        if(movable is not Player)
+            if(!CheckColission(movable, _playerOne, direction, deltaTime)) return false;
         return true;
     }
     public void ShiftWindow()
@@ -279,5 +250,56 @@ public class GameService
         }
 
         return false;
+    }
+
+    private bool CheckColission(IMovable movable, GameObject gameObject, Direction direction, float deltaTime)
+    {
+        float speed = movable.Speed * deltaTime;
+        GameObject obj = (GameObject)movable;
+        switch (direction)
+        {
+            case Direction.Right:
+                if (gameObject.Top <= obj.Bottom 
+                    && gameObject.Bottom >= obj.Top + _topMargin
+                    && gameObject.Left >= obj.Right 
+                    && obj.Right + speed > gameObject.Left)
+                    return false;
+                break;
+            case Direction.Left:
+                if (gameObject.Top <= obj.Bottom 
+                    && gameObject.Bottom >= obj.Top + _topMargin
+                    && gameObject.Right <= obj.Left 
+                    && obj.Left - speed < gameObject.Right)
+                    return false;
+                break;
+            case Direction.Up:
+                if (gameObject.Bottom <= obj.Top + _topMargin
+                    && gameObject.Bottom >= obj.Top + _topMargin - speed 
+                    && gameObject.Left <= obj.Right 
+                    && gameObject.Right >= obj.Left)
+                    return false;
+                break;
+            case Direction.Down:
+                if (gameObject.Top >= obj.Bottom 
+                    && gameObject.Top <= obj.Bottom + speed 
+                    && gameObject.Left <= obj.Right 
+                    && gameObject.Right >= obj.Left)
+                    return false;
+                break;
+        }
+
+        return true;
+    }
+
+    public Direction GetRandomDirection()
+    {
+        return _random.Next(5) switch
+        {
+            0 => Direction.Up,
+            1 => Direction.Down,
+            2 => Direction.Left,
+            3 => Direction.Right,
+            _ => Direction.Neutral
+        };
     }
 }

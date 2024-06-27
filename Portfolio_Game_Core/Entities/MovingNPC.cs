@@ -1,57 +1,52 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Portfolio_Game_Core.Data;
 using Portfolio_Game_Core.Interfaces;
 
-namespace Portfolio_Game_Core;
+namespace Portfolio_Game_Core.Entities;
 
-public class Player : GameObject, IMovable, IVisible
+public class MovingNPC: GameObject, IMovable, IVisible
 {
-    // private ISpriteData PlayerSpriteData { get; set; } = new PlayerSpriteData();
-    private ISpriteData PlayerSpriteData { get; set; } = new PlayerSpriteData();
-    public static float WalkSpeed = 150;
+    public string GraphicText { get; set; }
+    private ISpriteData NPCSpriteData { get; set; }
+    public static float WalkSpeed = 75;
+    public int maxSpriteCount;
+    public int MoveDelay { get; set; } = 50;
+    public int DelayCount { get; set; }
     public static float RunSpeed = 250;
-    public static int PlayerWidth { get; set; } = 32;
-    public static int PlayerHeight { get; set; } = 64;
-    public static Texture2D Texture { get; set; }
+    public static int NPCWidth { get; set; } = 32;
+    public static int NPCHeight { get; set; } = 64;
+    public  Texture2D Texture { get; set; }
     public float Speed { get; set; } = WalkSpeed;
-    private int _spriteChangeSpeed = 10;
+    public int WalkDuration { get; set; } = 10;
+    private int _spriteChangeSpeed = 5;
     private int _spriteNumber;
+    public int _currentWalkDuration = 0;
+    public bool isWalking= false;
     public PlayerState PlayerState { get; set; }
     public Direction Direction { get; set; }
 
-    public Player()
+    public MovingNPC(string graphicText,ISpriteData spriteData)
     {
-        Height = PlayerHeight;
-        Width = PlayerWidth;
+        NPCSpriteData = spriteData;
+        Height = NPCHeight;
+        Width = NPCWidth;
         PlayerState = PlayerState.Neutral;
         Direction = Direction.Down;
-        CurrentSprite = PlayerSpriteData.DownSprites[0];
+        CurrentSprite = NPCSpriteData.DownSprites[0];
         _spriteNumber = 0;
+        GraphicText = graphicText;
+        maxSpriteCount = spriteData.SpriteCount;
     }
-
-    public Player(int x, int y) : this()
+    public MovingNPC(int x, int y,string graphicText, ISpriteData spriteData) : this(graphicText,spriteData)
     {
         PositionX = x;
         PositionY = y;
     }
-
-    public Player(Texture2D texture, int x, int y) : this(x, y)
+    public MovingNPC(Texture2D texture, int x, int y,string graphicText, ISpriteData spriteData) : this(x, y,graphicText, spriteData)
     {
         Texture = texture;
     }
-
-    public Texture2D GetTexture()
-    {
-        return Texture;
-    }
-
-    public void SetTexture(Texture2D texture)
-    {
-        Texture = texture;
-    }
-
-    public void GoRight(float deltaTime, bool canMove, Direction secondDirection = Direction.Neutral)
+     public void GoRight(float deltaTime, bool canMove, Direction secondDirection = Direction.Neutral)
     {
         if (canMove)
         {
@@ -74,8 +69,8 @@ public class Player : GameObject, IMovable, IVisible
             _spriteNumber++;
         else
             _spriteNumber = 0;
-        if (_spriteNumber == 4 * _spriteChangeSpeed) _spriteNumber = 0;
-        CurrentSprite = PlayerSpriteData.RightSprites[_spriteNumber / _spriteChangeSpeed];
+        if (_spriteNumber == maxSpriteCount * _spriteChangeSpeed) _spriteNumber = 0;
+        CurrentSprite = NPCSpriteData.RightSprites[_spriteNumber / _spriteChangeSpeed];
         Direction = Direction.Right;
     }
 
@@ -102,8 +97,8 @@ public class Player : GameObject, IMovable, IVisible
             _spriteNumber++;
         else
             _spriteNumber = 0;
-        if (_spriteNumber == 4 * _spriteChangeSpeed) _spriteNumber = 0;
-        CurrentSprite = PlayerSpriteData.LeftSprites[_spriteNumber / _spriteChangeSpeed];
+        if (_spriteNumber == maxSpriteCount * _spriteChangeSpeed) _spriteNumber = 0;
+        CurrentSprite = NPCSpriteData.LeftSprites[_spriteNumber / _spriteChangeSpeed];
         Direction = Direction.Left;
     }
 
@@ -126,9 +121,9 @@ public class Player : GameObject, IMovable, IVisible
             _spriteNumber++;
         else
             _spriteNumber = 0;
-        if (_spriteNumber == 4 * _spriteChangeSpeed)
+        if (_spriteNumber == maxSpriteCount * _spriteChangeSpeed)
             _spriteNumber = 0;
-        CurrentSprite = PlayerSpriteData.UpSprites[_spriteNumber / _spriteChangeSpeed];
+        CurrentSprite = NPCSpriteData.UpSprites[_spriteNumber / _spriteChangeSpeed];
         Direction = Direction.Up;
     }
 
@@ -147,13 +142,12 @@ public class Player : GameObject, IMovable, IVisible
                 PositionX += (float)(Speed * 0.71 * deltaTime);
                 break;
         }
-
         if (Direction == Direction.Down)
             _spriteNumber++;
         else
             _spriteNumber = 0;
-        if (_spriteNumber == 4 * _spriteChangeSpeed) _spriteNumber = 0;
-        CurrentSprite = PlayerSpriteData.DownSprites[_spriteNumber / _spriteChangeSpeed];
+        if (_spriteNumber == maxSpriteCount * _spriteChangeSpeed) _spriteNumber = 0;
+        CurrentSprite = NPCSpriteData.DownSprites[_spriteNumber / _spriteChangeSpeed];
         Direction = Direction.Down;
     }
 
@@ -174,24 +168,67 @@ public class Player : GameObject, IMovable, IVisible
         }
     }
 
-    public void TurnPlayer()
+    public void TurnNPC()
     {
         switch (PlayerState)
         {
             default:
             case PlayerState.Neutral:
             case PlayerState.Down:
-                CurrentSprite = PlayerSpriteData.DownSprites[0];
+                CurrentSprite = NPCSpriteData.DownSprites[0];
                 break;
             case PlayerState.Up:
-                CurrentSprite = PlayerSpriteData.UpSprites[0];
+                CurrentSprite = NPCSpriteData.UpSprites[0];
                 break;
             case PlayerState.Right:
-                CurrentSprite = PlayerSpriteData.RightSprites[0];
+                CurrentSprite = NPCSpriteData.RightSprites[0];
                 break;
             case PlayerState.Left:
-                CurrentSprite = PlayerSpriteData.LeftSprites[0];
+                CurrentSprite = NPCSpriteData.LeftSprites[0];
                 break;
         }
+    }
+
+    public void Move(Direction direction,float deltaTime, bool canMove)
+    {
+        if (!isWalking)
+        {
+            DelayCount++;
+            if (DelayCount < MoveDelay) return;
+            DelayCount = 0;
+        }
+        isWalking = true;
+        switch (direction)
+        {
+            case Direction.Up:
+                GoUp(deltaTime,canMove);
+                break;
+            case Direction.Down:
+                GoDown(deltaTime,canMove);
+                break;
+            case Direction.Left:
+                GoLeft(deltaTime,canMove);
+                break;
+            case Direction.Right:
+                GoRight(deltaTime,canMove);
+                break;
+            default:
+                Direction = Direction.Neutral;
+                CurrentSprite = NPCSpriteData.DownSprites[0];
+                break;
+        }
+        _currentWalkDuration++;
+        if (_currentWalkDuration < WalkDuration) return;
+        _currentWalkDuration = 0;
+        isWalking = false;
+    }
+    public Texture2D GetTexture()
+    {
+        return Texture;
+    }
+
+    public void SetTexture(Texture2D texture)
+    {
+        Texture = texture;
     }
 }

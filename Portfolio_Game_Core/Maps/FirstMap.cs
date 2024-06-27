@@ -21,6 +21,12 @@ public class FirstMap:Map
         SeedObjects();
         SeedStartText();
         SeedWalls();
+        SeedMovables();
+    }
+
+    private void SeedMovables()
+    {
+        Objects.Add(new MovingNPC(100,100,"cat",new CatSpriteData()));
     }
 
     public override void SeedNextMaps()
