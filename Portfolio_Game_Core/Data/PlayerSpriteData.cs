@@ -1,10 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
+using Portfolio_Game_Core.Interfaces;
 
 namespace Portfolio_Game_Core;
 
-public static class SpriteData
+public class PlayerSpriteData: ISpriteData
 {
-
+    public int SpriteCount { get; set; } = 4;
     private static int _playerWidth { get; } = 32;
     private static int _playerHeight { get; } = 64;
     private static int row0 = 0;
@@ -35,20 +36,20 @@ public static class SpriteData
     private static Rectangle LeftSprite2 = new(column2, row3, _playerWidth, _playerHeight);
     private static Rectangle LeftSprite3 = new(column3, row3, _playerWidth, _playerHeight);
 
-    public static Rectangle[] UpSprites { get; } =
+    public Rectangle[] UpSprites { get; } =
     {
         UpSprite0, UpSprite1, UpSprite2, UpSprite3
     };
-    public static Rectangle[] RightSprites { get; } =
+    public Rectangle[] RightSprites { get; } =
     {
         RightSprite0, RightSprite1, RightSprite2, RightSprite3
     };
     
-    public static Rectangle[] DownSprites { get; } =
+    public Rectangle[] DownSprites { get; } =
     {
         DownSprite0, DownSprite1, DownSprite2, DownSprite3
     };
-    public static Rectangle[] LeftSprites { get; } =
+    public Rectangle[] LeftSprites { get; } =
     {
         LeftSprite0, LeftSprite1, LeftSprite2, LeftSprite3
     };

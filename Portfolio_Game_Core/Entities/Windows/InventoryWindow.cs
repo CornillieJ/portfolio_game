@@ -9,8 +9,8 @@ namespace Portfolio_Game_Core.Entities;
 public class InventoryWindow:Window,IVisible
 {
     public Direction location { get; set; } = Direction.Right;
-    private static int InventoryWindowWidth => 320;
-    public static int InventoryWindowHeight => 400;
+    public static int InventoryWindowWidth { get; set; } = 320;
+    public static int InventoryWindowHeight { get; set; } = 400;
     public static Texture2D Texture { get; set; }
     public bool IsOpen { get; set; }
     public List<GameItem> Inventory { get; set; }

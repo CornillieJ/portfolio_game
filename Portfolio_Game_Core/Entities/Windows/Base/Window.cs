@@ -11,8 +11,9 @@ public class Window:GameObject
     private static int WindowHeight;
     public int TextMarginX = 48;
     public int TextMarginY = 48;
-    public int TitleMarginX = 15;
-    public int TitleMarginY = 15;
+    public static int TitleMarginX = 15;
+    public static int TitleMarginY = 15;
+    public static int LineMarginY = 5;
     private List<Text> _title;
 
     public IEnumerable<Text> Title
@@ -73,12 +74,12 @@ public class Window:GameObject
             if (textX + word.Length * Text.TextWidth >= PositionX + textWindowWidth - TextMarginX)
             {
                 textX = PositionX + TextMarginX;
-                textY += Text.TextHeight;
+                textY += Text.TextHeight + LineMarginY;
             }
             if (word == "\n")
             {
                 textX = PositionX + TextMarginX;
-                textY += Text.TextHeight;
+                textY += Text.TextHeight + LineMarginY;
                 continue;
             }
             foreach (char c in word)

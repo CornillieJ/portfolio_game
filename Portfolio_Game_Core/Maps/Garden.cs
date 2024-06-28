@@ -26,8 +26,10 @@ public class Garden:Map
 
     public override  void SeedNextMaps()
     {
-        MapExits.Add(new Vector2(927,670),( MapService.Maps["house-entry"],Direction.Down));
-        MapExits.Add(new Vector2(928,926),(MapService.Maps["house-entry"],Direction.Up));
+        MapExits.Add(new Vector2(930,668),( MapService.Maps["house-entry"],Direction.Down));
+        MapExits.Add(new Vector2(900,668),( MapService.Maps["house-entry"],Direction.Down));
+        MapExits.Add(new Vector2(950,668),( MapService.Maps["house-entry"],Direction.Down));
+        MapExits.Add(new Vector2(928,910),(MapService.Maps["house-entry"],Direction.Up));
     }
 
     protected override void SeedObjects()
@@ -53,17 +55,18 @@ public class Garden:Map
         int wallWidth = 15;
         Vector2 fenceOrigin = new(671, 440);
         Vector2 fenceSize = new(522,240);
-        int gapMargin = 30;
+        int gapMarginLeft = 40;
+        int gapMarginRight = 20;
         Objects.Add(new InvisibleWall(fenceOrigin.X,fenceOrigin.Y,fenceSize.X,wallWidth));
-        Objects.Add(new InvisibleWall(fenceOrigin.X,fenceOrigin.Y+fenceSize.Y-wallWidth,fenceSize.X/2-gapMargin/2,wallWidth));
-        Objects.Add(new InvisibleWall(fenceOrigin.X + fenceSize.X/2+gapMargin,fenceOrigin.Y+fenceSize.Y-wallWidth,fenceSize.X/2-gapMargin/2,wallWidth));
+        Objects.Add(new InvisibleWall(fenceOrigin.X,fenceOrigin.Y+fenceSize.Y-wallWidth,fenceSize.X/2-gapMarginLeft,wallWidth));
+        Objects.Add(new InvisibleWall(fenceOrigin.X + fenceSize.X/2 + gapMarginRight,fenceOrigin.Y+fenceSize.Y-wallWidth,fenceSize.X/2-gapMarginRight,wallWidth));
         Objects.Add(new InvisibleWall(fenceOrigin.X,fenceOrigin.Y,wallWidth,fenceSize.Y));
         Objects.Add(new InvisibleWall(fenceOrigin.X+fenceSize.X - wallWidth,fenceOrigin.Y,wallWidth,fenceSize.Y));
-        Vector2 houseOrigin = new(740, 690);
-        Vector2 houseSize = new(380,235);
+        Vector2 houseOrigin = new(740, 688);
+        Vector2 houseSize = new(380,237);
         Objects.AddRange(MapHelper.GetSurroundingInvisibleWalls(houseOrigin,houseSize,20));
         //TODO: Remove this invisible wall and expand garden
-        Objects.AddRange(MapHelper.GetSurroundingInvisibleWalls(new (508,480),new(864,639),20));
+        Objects.AddRange(MapHelper.GetSurroundingInvisibleWalls(new (508,380),new(864,740),20));
     }
     
     private void SeedTopGraphics()
@@ -75,7 +78,7 @@ public class Garden:Map
         switch (entryDirection)
         {
             case Direction.Down:
-                EntryLocation = new Vector2(920,930);
+                EntryLocation = new Vector2(918,928);
                 break;
             case Direction.Up:
                 EntryLocation = new Vector2(920 , 600);
