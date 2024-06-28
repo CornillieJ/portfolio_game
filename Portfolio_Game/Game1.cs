@@ -119,10 +119,8 @@ public class Game1 : Game
     {
         HandleKeyboard(gameTime);
         HandleInteractions();
-        MovePlayerOnInput(gameTime);
         MoveRandomNPCs(gameTime);
         HandleMouse();
-        
         _gameService.MoveInventoryOnPlayerPosition();
         base.Update(gameTime);
     }
@@ -233,9 +231,9 @@ public class Game1 : Game
             return;
         }
         //Only check input up to here if there are open text windows (no walking allowed if open)
-
+        MovePlayerOnInput(gameTime);
+        
         //this checks if any interactions have been added to interactables. if so, will interact with them
-
         if ((IsKeyDown(Keys.Space) || IsKeyDown(Keys.Enter)) && _isActionPressed == false)
         {
             _pressedKeys = Array.Empty<Keys>(); //To fix bug sticking key on simultaneously pressing space

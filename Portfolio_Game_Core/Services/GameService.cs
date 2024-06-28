@@ -157,7 +157,8 @@ public class GameService
             case ResultAction.NoMoreInteraction:
                 string endTitle = CurrentMap.Interactables[0].NoInteractionText.Item1;
                 string endContent = CurrentMap.Interactables[0].NoInteractionText.Item2;
-                CurrentMap.Windows.Add(_windowCreator.GetTextWindow(endTitle, endContent)); 
+                if (!CurrentMap.Windows.Contains(_windowCreator.GetTextWindow(endTitle, endContent)))
+                    CurrentMap.Windows.Add(_windowCreator.GetTextWindow(endTitle, endContent));
                 break;
             case ResultAction.AddObject:
                 foreach (var gameObject in CurrentMap.Interactables[0].ObjectAdditions)
