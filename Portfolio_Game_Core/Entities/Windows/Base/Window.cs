@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.Xna.Framework;
 using Portfolio_Game_Core.Font;
 using Portfolio_Game_Core.Interfaces;
 
@@ -10,7 +11,9 @@ public class Window:GameObject
     private static int WindowHeight;
     public int TextMarginX = 48;
     public int TextMarginY = 48;
-    public int TitleMargin = 10;
+    public static int TitleMarginX = 15;
+    public static int TitleMarginY = 15;
+    public static int LineMarginY = 5;
     private List<Text> _title;
 
     public IEnumerable<Text> Title
@@ -31,13 +34,30 @@ public class Window:GameObject
     public List<Text> GetTitle(string title)
     {
         List<Text> result = new();
-        float textX = PositionX + TitleMargin; 
+        float textX = PositionX + TitleMarginX; 
+        float textY = PositionY + TitleMarginY; 
         foreach (char c in title)
         {
             if (int.TryParse(c.ToString(), out int value))
-                result.Add(new Number(textX, PositionY+5, c));
+                result.Add(new Number(textX, textY, c));
             else
-                result.Add(new Letter(textX, PositionY+5, c));
+                result.Add(new Letter(textX, textY, c));
+            textX += Text.TextWidth;
+        }
+
+        return result;
+    }
+    public List<Text> GetNextText(string nextText)
+    {
+        List<Text> result = new();
+        float textX = Right - (nextText.Length * Text.TextWidth);;
+        float textY = Bottom - TextMarginY;
+        foreach (char c in nextText)
+        {
+            if (int.TryParse(c.ToString(), out int value))
+                result.Add(new Number(textX, textY, c));
+            else
+                result.Add(new Letter(textX, textY, c));
             textX += Text.TextWidth;
         }
 
@@ -54,12 +74,12 @@ public class Window:GameObject
             if (textX + word.Length * Text.TextWidth >= PositionX + textWindowWidth - TextMarginX)
             {
                 textX = PositionX + TextMarginX;
-                textY += Text.TextHeight;
+                textY += Text.TextHeight + LineMarginY;
             }
             if (word == "\n")
             {
                 textX = PositionX + TextMarginX;
-                textY += Text.TextHeight;
+                textY += Text.TextHeight + LineMarginY;
                 continue;
             }
             foreach (char c in word)
