@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
+using Microsoft.VisualBasic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -20,6 +22,7 @@ namespace Portfolio_Game;
 
 public class Game1 : Game
 {
+    #region Global Variables
     float _zoomFactor = 1.0f;
     float _resolutionScaleFactor = 1.0f;
     private Texture2D _debugTexture; 
@@ -35,8 +38,11 @@ public class Game1 : Game
     private int _interactCounter = 0;
     private Vector2 _initialPlayerPosition = new(0, 0);
     private DrawHelper _drawHelper;
-    private Texture2D _headTexture; 
+    private Texture2D _headTexture;
+    private Keys[] _pressedKeys;
+    #endregion
 
+    #region Initialization and content loading
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);        
@@ -59,17 +65,6 @@ public class Game1 : Game
         player.PositionX = _gameService.CurrentMap.Width / 2 - (player.Width / 2);
         player.PositionY = _gameService.CurrentMap.Height / 2 - (player.Height / 2);
         base.Initialize();
-    }
-    private void ScaleWindows()
-    {
-        WindowCreator.WindowMargin = (int)(WindowCreator.WindowMargin * _resolutionScaleFactor);
-        TextWindow.TextWindowWidth = (int)(TextWindow.TextWindowWidth * _resolutionScaleFactor);
-        Portfolio_Game_Core.Entities.Window.LineMarginY = (int)(Portfolio_Game_Core.Entities.Window.LineMarginY * _resolutionScaleFactor);
-        Portfolio_Game_Core.Entities.Window.TitleMarginX = (int)(Portfolio_Game_Core.Entities.Window.TitleMarginX * _resolutionScaleFactor);
-        Portfolio_Game_Core.Entities.Window.TitleMarginY = (int)(Portfolio_Game_Core.Entities.Window.TitleMarginY * _resolutionScaleFactor);
-        InventoryWindow.InventoryWindowHeight = (int)(InventoryWindow.InventoryWindowHeight * _resolutionScaleFactor);
-        InventoryWindow.InventoryWindowWidth = (int)(InventoryWindow.InventoryWindowWidth * _resolutionScaleFactor);
-        // TextWindow.TextWindowHeight = (int)(TextWindow.TextWindowHeight * _resolutionScaleFactor);
     }
     protected override void LoadContent()
     {
@@ -119,117 +114,18 @@ public class Game1 : Game
         Text.Texture = Content.Load<Texture2D>("font2");
  
     }
+    #endregion Initialization and content loading
     protected override void Update(GameTime gameTime)
     {
-        var kstate = Keyboard.GetState();
-        var mstate = Mouse.GetState();
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
-            kstate.IsKeyDown(Keys.Escape))
-            Exit();
-        if (!kstate.IsKeyDown(Keys.Space) && !kstate.IsKeyDown(Keys.Enter))
-        {
-            _isActionPressed = false;
-        }
-        if (!kstate.IsKeyDown(Keys.LeftAlt) && !kstate.IsKeyDown(Keys.Enter))
-        {
-            _isFullscreenPressed = false;
-        }
-        if (kstate.IsKeyDown(Keys.LeftAlt) && kstate.IsKeyDown(Keys.Enter) && _isFullscreenPressed == false)
-        {
-            
-            _isFullscreenPressed = true;
-        }
-        if (_gameService.CurrentMap.Windows.OfType<TextWindow>().Any())
-        {
-            if (_isActionPressed) return;
-            if (kstate.IsKeyDown(Keys.Space) || kstate.IsKeyDown(Keys.Enter))
-            {
-                _isActionPressed = true;
-                _gameService.ShiftWindow();
-            }
-
-            base.Update(gameTime);
-            return;
-        }
-        //Only check input up to here if there are open text windows (no walking allowed if open)
-
-        //this checks if any interactions have been added to interactables. if so, will interact with them
-        if (_gameService.CurrentMap.Interactables.Any())
-        {
-            _gameService.InteractAll(ref _interactCounter, ref _initialPlayerPosition);
-            return;
-        }
-        _interactCounter = 0;
-        MovePlayerOnInput(gameTime, kstate);
+        HandleKeyboard(gameTime);
+        HandleInteractions();
+        MovePlayerOnInput(gameTime);
         MoveRandomNPCs(gameTime);
-        if ((kstate.IsKeyDown(Keys.Space) || kstate.IsKeyDown(Keys.Enter)) && _isActionPressed == false)
-        {
-            _isActionPressed = true;
-            var gameObjectsInView = _gameService.GetObjectsPlayerIsLookingAt();
-            foreach (var gameObjectInView in gameObjectsInView)
-            {
-                if (gameObjectInView is IInteractable interactable)
-                    _gameService.AddInteraction(interactable);
-            }
-        }
-
-        if ((kstate.IsKeyDown(Keys.I) || kstate.IsKeyDown(Keys.Tab)) && _isInventoryPressed == false)
-        {
-            _isInventoryPressed = true;
-            _gameService.InventoryWindow.IsOpen = !_gameService.InventoryWindow.IsOpen;
-        }
-
-        if (!kstate.IsKeyDown(Keys.I) && !kstate.IsKeyDown(Keys.Tab))
-        {
-            _isInventoryPressed = false;
-        }
-
-        if (mstate.LeftButton == ButtonState.Pressed && _leftClicked == false)
-        {
-            if (GetItemUnderMouse(mstate) is GameItem item)
-                _gameService.AddTextWindow("Description", item.Description);
-        }
-
-        if (mstate.RightButton == ButtonState.Pressed && _rightClicked == false)
-        {
-            var item = GetItemUnderMouse(mstate); 
-            if ( item is ProgramItem program)
-                RunProgram(program.ProgramPath);
-            if (item is Website website)
-                OpenWebsite(website.ProgramPath);
-        }
-
-        if (kstate.IsKeyDown(Keys.LeftControl) && mstate.ScrollWheelValue > _lastScrollWheelValue)
-        {
-            _zoomFactor += _zoomFactor >= 2F ? 0 : 0.1F;
-        }
-
-        if (kstate.IsKeyDown(Keys.LeftControl) && mstate.ScrollWheelValue < _lastScrollWheelValue)
-        {
-            _zoomFactor -= _zoomFactor <= 0.9F ? 0 : 0.1F;
-        }
-
-        _lastScrollWheelValue = mstate.ScrollWheelValue;
-        _leftClicked = mstate.LeftButton == ButtonState.Pressed;
-        _rightClicked = mstate.RightButton == ButtonState.Pressed;
+        HandleMouse();
+        
         _gameService.MoveInventoryOnPlayerPosition();
         base.Update(gameTime);
     }
-    private void MoveRandomNPCs(GameTime gameTime)
-    {
-        foreach (var movingNPC in _gameService.CurrentMap.Objects.OfType<MovingNPC>())
-        {
-            Direction direction;
-            if (movingNPC.isWalking)
-                direction = movingNPC.Direction;
-            else
-                direction = _gameService.GetRandomDirection();
-            bool canMove = _gameService.CanMove(movingNPC, direction,
-                (float)gameTime.ElapsedGameTime.TotalSeconds);
-            movingNPC.Move(direction,(float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
-        }
-    }
-
     protected override void Draw(GameTime gameTime)
     {
         float translateX = GraphicsDevice.Viewport.Width / 2 - (_gameService._playerOne.Middle.X * _zoomFactor);
@@ -262,6 +158,32 @@ public class Game1 : Game
 
         base.Draw(gameTime);
     }
+    #region Game Logic Methods
+    private void MoveRandomNPCs(GameTime gameTime)
+    {
+        foreach (var movingNPC in _gameService.CurrentMap.Objects.OfType<MovingNPC>())
+        {
+            Direction direction;
+            if (movingNPC.isWalking)
+                direction = movingNPC.Direction;
+            else
+                direction = _gameService.GetRandomDirection();
+            bool canMove = _gameService.CanMove(movingNPC, direction,
+                (float)gameTime.ElapsedGameTime.TotalSeconds);
+            movingNPC.Move(direction,(float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
+        }
+    } 
+    private void HandleInteractions()
+    {
+        if (_gameService.CurrentMap.Interactables.Any())
+        {
+            _gameService.InteractAll(ref _interactCounter, ref _initialPlayerPosition);
+            return;
+        }
+        _interactCounter = 0;
+    }
+    #endregion
+    #region Drawing MapObject Methods
     public void DrawMiddleGraphicObjects()
     {
         foreach (var graphicMiddleObject in _gameService.CurrentMap.GraphicMiddleObjects)
@@ -284,6 +206,94 @@ public class Game1 : Game
             , topGraphic.CurrentSprite
             , Color.White);
     }
+   
+    #endregion Drawing mapObject methods
+    #region Handle Input
+     private void HandleKeyboard(GameTime gameTime)
+    {
+        var kstate = Keyboard.GetState();
+        _pressedKeys = kstate.GetPressedKeys();
+        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || IsKeyDown(Keys.Escape))
+            Exit();
+        if (!IsKeyDown(Keys.Space) && !IsKeyDown(Keys.Enter))
+            _isActionPressed = false;
+        if (!IsKeyDown(Keys.LeftAlt) && !IsKeyDown(Keys.Enter))
+            _isFullscreenPressed = false;
+        if (IsKeyDown(Keys.LeftAlt) && IsKeyDown(Keys.Enter) && _isFullscreenPressed == false)
+            _isFullscreenPressed = true;
+        if (_gameService.CurrentMap.Windows.OfType<TextWindow>().Any())
+        {
+            if (_isActionPressed) return;
+            if (IsKeyDown(Keys.Space) || IsKeyDown(Keys.Enter))
+            {
+                _isActionPressed = true;
+                _gameService.ShiftWindow();
+            }
+            base.Update(gameTime);
+            return;
+        }
+        //Only check input up to here if there are open text windows (no walking allowed if open)
+
+        //this checks if any interactions have been added to interactables. if so, will interact with them
+
+        if ((IsKeyDown(Keys.Space) || IsKeyDown(Keys.Enter)) && _isActionPressed == false)
+        {
+            _pressedKeys = Array.Empty<Keys>(); //To fix bug sticking key on simultaneously pressing space
+            _isActionPressed = true; //for debouncing
+            var gameObjectsInView = _gameService.GetObjectsPlayerIsLookingAt();
+            //add pending interactions to array if object in view is interactable, interact happens at different location
+            foreach (var gameObjectInView in gameObjectsInView)
+            {
+                if (gameObjectInView is IInteractable interactable)
+                    _gameService.AddInteraction(interactable); 
+            }
+        }
+
+        if ((IsKeyDown(Keys.I) || IsKeyDown(Keys.Tab)) && _isInventoryPressed == false)
+        {
+            _isInventoryPressed = true;
+            _gameService.InventoryWindow.IsOpen = !_gameService.InventoryWindow.IsOpen;
+        }
+
+        if (!IsKeyDown(Keys.I) && !IsKeyDown(Keys.Tab))
+        {
+            _isInventoryPressed = false;
+        }
+    }
+
+
+    private void HandleMouse()
+    {
+        var mstate = Mouse.GetState();
+        if (mstate.LeftButton == ButtonState.Pressed && _leftClicked == false)
+        {
+            if (GetItemUnderMouse(mstate) is GameItem item)
+                _gameService.AddTextWindow("Description", item.Description);
+        }
+
+        if (mstate.RightButton == ButtonState.Pressed && _rightClicked == false)
+        {
+            var item = GetItemUnderMouse(mstate); 
+            if ( item is ProgramItem program)
+                RunProgram(program.ProgramPath);
+            if (item is Website website)
+                OpenWebsite(website.ProgramPath);
+        }
+
+        if (IsKeyDown(Keys.LeftControl) && mstate.ScrollWheelValue > _lastScrollWheelValue)
+        {
+            _zoomFactor += _zoomFactor >= 2F ? 0 : 0.1F;
+        }
+
+        if (IsKeyDown(Keys.LeftControl) && mstate.ScrollWheelValue < _lastScrollWheelValue)
+        {
+            _zoomFactor -= _zoomFactor <= 0.9F ? 0 : 0.1F;
+        }
+
+        _lastScrollWheelValue = mstate.ScrollWheelValue;
+        _leftClicked = mstate.LeftButton == ButtonState.Pressed;
+        _rightClicked = mstate.RightButton == ButtonState.Pressed;
+    }
     private GameItem GetItemUnderMouse(MouseState mstate)
     {
         if (_gameService.InventoryWindow.IsOpen)
@@ -300,45 +310,49 @@ public class Game1 : Game
 
         return null;
     }
-    private void MovePlayerOnInput(GameTime gameTime, KeyboardState kstate)
+    private bool IsKeyDown(Keys key)
+    {
+        return _pressedKeys.Contains(key);
+    }
+    private void MovePlayerOnInput(GameTime gameTime)
     {
         PlayerState newPlayerState = PlayerState.Neutral;
-        if (kstate.IsKeyDown(Keys.LeftShift))
+        if (IsKeyDown(Keys.LeftShift))
             _gameService._playerOne.Speed = Player.RunSpeed;
         else
             _gameService._playerOne.Speed = Player.WalkSpeed;
-        if (kstate.IsKeyDown(Keys.W))
+        if (IsKeyDown(Keys.W))
         {
             newPlayerState = PlayerState.Up;
             Direction secondDirection = Direction.Neutral;
             bool canMove = _gameService.CanMove(_gameService._playerOne, Direction.Up,
                 (float)gameTime.ElapsedGameTime.TotalSeconds);
-            if (kstate.IsKeyDown(Keys.A) && _gameService.CanMove(_gameService._playerOne, Direction.Left,
+            if (IsKeyDown(Keys.A) && _gameService.CanMove(_gameService._playerOne, Direction.Left,
                     (float)gameTime.ElapsedGameTime.TotalSeconds)) secondDirection = Direction.Left;
-            if (kstate.IsKeyDown(Keys.D) && _gameService.CanMove(_gameService._playerOne, Direction.Right,
+            if (IsKeyDown(Keys.D) && _gameService.CanMove(_gameService._playerOne, Direction.Right,
                     (float)gameTime.ElapsedGameTime.TotalSeconds)) secondDirection = Direction.Right;
             _gameService._playerOne.GoUp((float)gameTime.ElapsedGameTime.TotalSeconds, canMove, secondDirection);
         }
-        else if (kstate.IsKeyDown(Keys.S))
+        else if (IsKeyDown(Keys.S))
         {
             newPlayerState = PlayerState.Down;
             bool canMove = _gameService.CanMove(_gameService._playerOne, Direction.Down,
                 (float)gameTime.ElapsedGameTime.TotalSeconds);
             Direction secondDirection = Direction.Neutral;
-            if (kstate.IsKeyDown(Keys.A) && _gameService.CanMove(_gameService._playerOne, Direction.Left,
+            if (IsKeyDown(Keys.A) && _gameService.CanMove(_gameService._playerOne, Direction.Left,
                     (float)gameTime.ElapsedGameTime.TotalSeconds)) secondDirection = Direction.Left;
-            if (kstate.IsKeyDown(Keys.D) && _gameService.CanMove(_gameService._playerOne, Direction.Right,
+            if (IsKeyDown(Keys.D) && _gameService.CanMove(_gameService._playerOne, Direction.Right,
                     (float)gameTime.ElapsedGameTime.TotalSeconds)) secondDirection = Direction.Right;
             _gameService._playerOne.GoDown((float)gameTime.ElapsedGameTime.TotalSeconds, canMove, secondDirection);
         }
-        else if (kstate.IsKeyDown(Keys.A))
+        else if (IsKeyDown(Keys.A))
         {
             newPlayerState = PlayerState.Left;
             bool canMove = _gameService.CanMove(_gameService._playerOne, Direction.Left,
                 (float)gameTime.ElapsedGameTime.TotalSeconds);
             _gameService._playerOne.GoLeft((float)gameTime.ElapsedGameTime.TotalSeconds, canMove);
         }
-        else if (kstate.IsKeyDown(Keys.D))
+        else if (IsKeyDown(Keys.D))
         {
             newPlayerState = PlayerState.Right;
             bool canMove = _gameService.CanMove(_gameService._playerOne, Direction.Right,
@@ -353,6 +367,8 @@ public class Game1 : Game
             if(isNewMap) LoadContent();
         }
     }
+    #endregion Handle input
+    #region Open Program or Website
     private void RunProgram(string programPath)
     {
         try
@@ -381,6 +397,8 @@ public class Game1 : Game
             _gameService.AddTextWindow("Error", string.Concat("Could not start program: ", ex.Message.AsSpan(0, 20)));
         }
     }
+    #endregion
+    #region Methods for debugging or unused
     private void ShowExits()
     {
         foreach (var exit in _gameService.CurrentMap.MapExits.Keys)
@@ -388,4 +406,16 @@ public class Game1 : Game
             _spriteBatch.Draw(_debugTexture, new Rectangle((int)exit.X-5, (int)exit.Y-5, 10, 10), Color.Red);
         }
     }    
+    private void ScaleWindows()
+    {
+        WindowCreator.WindowMargin = (int)(WindowCreator.WindowMargin * _resolutionScaleFactor);
+        TextWindow.TextWindowWidth = (int)(TextWindow.TextWindowWidth * _resolutionScaleFactor);
+        Portfolio_Game_Core.Entities.Window.LineMarginY = (int)(Portfolio_Game_Core.Entities.Window.LineMarginY * _resolutionScaleFactor);
+        Portfolio_Game_Core.Entities.Window.TitleMarginX = (int)(Portfolio_Game_Core.Entities.Window.TitleMarginX * _resolutionScaleFactor);
+        Portfolio_Game_Core.Entities.Window.TitleMarginY = (int)(Portfolio_Game_Core.Entities.Window.TitleMarginY * _resolutionScaleFactor);
+        InventoryWindow.InventoryWindowHeight = (int)(InventoryWindow.InventoryWindowHeight * _resolutionScaleFactor);
+        InventoryWindow.InventoryWindowWidth = (int)(InventoryWindow.InventoryWindowWidth * _resolutionScaleFactor);
+        // TextWindow.TextWindowHeight = (int)(TextWindow.TextWindowHeight * _resolutionScaleFactor);
+    }
+    #endregion
 }
